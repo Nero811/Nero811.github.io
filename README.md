@@ -1,5 +1,5 @@
 # Leetcode刷題日誌
-### 我是Jack Yang 每天利用下班時間刷Leetcode，在此紀錄一下，持續精進自己的Coding能力
+### 我是Jack Yang 每天利用下班時間刷Leetcode，這裡是我的刷題日誌，持續精進自己的Coding能力
 ### 環境:Ubuntu 編譯器:vim
 ### 使用語言:C/C++/Python
 
