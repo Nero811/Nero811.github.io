@@ -13,7 +13,6 @@ public class Solution {
         for (int i = 0 ; i < nums.length ; i++) {
             map.put(i,nums[i]);
         }
-        List<Integer> lt = new ArrayList<>();
         for (int i = 0 ; i < nums.length ; i++) {
             int num1 = map.get(i);
             map.remove(i);
@@ -22,14 +21,11 @@ public class Solution {
                 map.remove(j);
                 int num3 = 0 - (num1 + num2);
                 if (map.containsValue(num3)){
-                    lt.add(num1);
-                    lt.add(num2);
-                    lt.add(num3);
-                    List<Integer> newLt = lt.stream().sorted().collect(Collectors.toList());
-                    if (!result.contains(newLt)) {
-                        result.add(newLt);
+                    List<Integer> list = new ArrayList<>(Arrays.asList(num1,num2,num3));
+                    Collections.sort(list);
+                    if (!result.contains(list)) {
+                        result.add(list);
                     }
-                    lt.clear();
                 }
                 map.put(j,nums[j]);
             }
