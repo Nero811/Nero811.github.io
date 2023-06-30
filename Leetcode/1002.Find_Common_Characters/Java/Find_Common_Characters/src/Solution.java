@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
  * Description:1002. Find Common Characters
  */
 public class Solution {
-    public int[] updateHash(int[] hash,String words) {
+    public void updateHash(int[] hash,String words) {
         int[] newHash = new int[27];
         for (Character c : words.toCharArray()) {
             newHash[(int) c - (int) 'a']++;
@@ -18,7 +18,6 @@ public class Solution {
         for (int i = 0 ; i < 27 ; i++) {
             hash[i] = Math.min(hash[i],newHash[i]);
         }
-        return hash;
     }
     public List<String> commonChars(String[] words) {
         if (words.length == 1) {
@@ -30,7 +29,7 @@ public class Solution {
             hash[ (int) c - (int) 'a']++;
         }
         for (int i = 1 ; i < words.length ; i++) {
-            hash = this.updateHash(hash,words[i]);
+            this.updateHash(hash,words[i]);
         }
         for (int i = 0 ; i < hash.length ; i++){
             while (hash[i] > 0) {
