@@ -1,0 +1,6 @@
+﻿  Source.cpp
+D:\C++\LeetCode\491. Non-decreasing Subsequences\491. Non-decreasing Subsequences\491. Non-decreasing Subsequences\Source.cpp(12,16): warning C4018: '>=': signed/unsigned 不相符
+D:\C++\LeetCode\491. Non-decreasing Subsequences\491. Non-decreasing Subsequences\491. Non-decreasing Subsequences\Source.cpp(16,28): warning C4018: '<': signed/unsigned 不相符
+D:\C++\LeetCode\491. Non-decreasing Subsequences\491. Non-decreasing Subsequences\491. Non-decreasing Subsequences\Source.cpp(51,20): warning C4018: '<': signed/unsigned 不相符
+D:\C++\LeetCode\491. Non-decreasing Subsequences\491. Non-decreasing Subsequences\491. Non-decreasing Subsequences\Source.cpp(52,21): warning C4018: '<': signed/unsigned 不相符
+  491. Non-decreasing Subsequences.vcxproj -> D:\C++\LeetCode\491. Non-decreasing Subsequences\491. Non-decreasing Subsequences\Debug\491. Non-decreasing Subsequences.exe
