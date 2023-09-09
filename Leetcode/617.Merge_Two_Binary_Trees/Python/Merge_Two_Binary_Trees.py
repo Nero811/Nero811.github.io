@@ -10,6 +10,8 @@ class TreeNode:
 
 class Solution:
     def travel(self, root1, root2) -> TreeNode:
+        # 遞迴終止條件
+        # 凡有一個節點為空，就返回另外一個節點，兩個都為空就返回None
         if root1 == None or root2 == None:
             if root1 and root2 == None:
                 return root1
