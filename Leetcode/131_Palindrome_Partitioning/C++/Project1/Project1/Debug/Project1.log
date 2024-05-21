@@ -1,6 +1,0 @@
-﻿  Source.cpp
-D:\C++\LeetCode\131. Palindrome Partitioning\Project1\Project1\Source.cpp(16,15): warning C4018: '>=': signed/unsigned 不相符
-D:\C++\LeetCode\131. Palindrome Partitioning\Project1\Project1\Source.cpp(20,28): warning C4018: '<': signed/unsigned 不相符
-D:\C++\LeetCode\131. Palindrome Partitioning\Project1\Project1\Source.cpp(46,20): warning C4018: '<': signed/unsigned 不相符
-D:\C++\LeetCode\131. Palindrome Partitioning\Project1\Project1\Source.cpp(47,21): warning C4018: '<': signed/unsigned 不相符
-  Project1.vcxproj -> D:\C++\LeetCode\131. Palindrome Partitioning\Project1\Debug\Project1.exe

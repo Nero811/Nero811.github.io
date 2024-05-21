@@ -1,7 +1,0 @@
-﻿  Source.cpp
-D:\C++\LeetCode\78. Subsets\78. Subsets\78. Subsets\Source.cpp(8,16): warning C4018: '>=': signed/unsigned 不相符
-D:\C++\LeetCode\78. Subsets\78. Subsets\78. Subsets\Source.cpp(14,28): warning C4018: '<': signed/unsigned 不相符
-D:\C++\LeetCode\78. Subsets\78. Subsets\78. Subsets\Source.cpp(27,21): warning C4018: '<': signed/unsigned 不相符
-D:\C++\LeetCode\78. Subsets\78. Subsets\78. Subsets\Source.cpp(46,20): warning C4018: '<': signed/unsigned 不相符
-D:\C++\LeetCode\78. Subsets\78. Subsets\78. Subsets\Source.cpp(47,21): warning C4018: '<': signed/unsigned 不相符
-  78. Subsets.vcxproj -> D:\C++\LeetCode\78. Subsets\78. Subsets\Debug\78. Subsets.exe
