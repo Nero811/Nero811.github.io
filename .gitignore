@@ -1,5 +1,5 @@
 *.vscode
 *.json
-/bin/
+/bin/**
 /lib/
 /Leetcode/README.md
