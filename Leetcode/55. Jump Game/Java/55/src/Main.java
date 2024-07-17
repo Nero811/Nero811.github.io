@@ -1,4 +1,7 @@
 public class Main {
+    /*
+    貪心算法
+     */
     public static boolean canJump(int[] nums) {
         for (int cur = 0, fast = 0; fast < nums.length ; fast++) {
             int maxStep = 0;
