@@ -1,0 +1,728 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-TW" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icons8-code-48.png">
+  <link rel="icon" href="/img/icons8-code-48.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Jack Yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言本篇使用Podman並使用minikube作為k8s cluster，並在minikube上啟動一個ubuntu pod並在裡面安裝Ansible，目標透過Ansible在minikube啟動一個redis pod。 什麼是 MinikubeMinikube 是由 Google 發布的一個輕量級工具。讓開發者可以在本機上輕易架設一個 Kubernetes Cluster，快速上手 Kubern">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Minikube + Ansible部屬微服務">
+<meta property="og:url" content="https://nero811.github.io/2024/08/04/%E4%BD%BF%E7%94%A8Minikube%20+%20Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/index.html">
+<meta property="og:site_name" content="Jack的後端工程師BLOG">
+<meta property="og:description" content="前言本篇使用Podman並使用minikube作為k8s cluster，並在minikube上啟動一個ubuntu pod並在裡面安裝Ansible，目標透過Ansible在minikube啟動一個redis pod。 什麼是 MinikubeMinikube 是由 Google 發布的一個輕量級工具。讓開發者可以在本機上輕易架設一個 Kubernetes Cluster，快速上手 Kubern">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/f1378bee-5841-4e19-89d0-d461e159a1dc.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/211f417d-3b5e-41ff-b0e4-05ea2398772f.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/59280206-a930-4ef1-b92e-80bec7bb5e13.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/bea93b06-9f59-444e-9aa5-e29d7f2ab13a.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/73630251-cd28-4c29-bfb8-38127558fe87.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/0da46c9b-d994-4302-b04b-b3ebd3a656e6.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/34af0d63-6176-453c-bcb8-515f79c13148.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/5efc9d38-aa1d-4431-b030-0a78dc547b2a.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/781fb772-587c-43d8-b5c4-085b8069af8d.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/a7e2d1db-ad78-4400-b877-8d774a4e2f1b.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/a7a9b9b1-20bb-4cb2-82aa-d72bc1a9c7f9.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/c542eb5e-f0cf-4225-b6f8-c27c9e3e425d.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/ab22cff3-8034-44c0-8b8c-155a96892f84.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/a2d9d764-5d0a-4680-8234-2e6283906530.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/1c129f5b-63ab-4046-a53f-c11a60265ca0.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/de2cf3f7-aec7-4541-bd84-1b5b009879f2.webp">
+<meta property="article:published_time" content="2024-08-04T14:20:13.571Z">
+<meta property="article:modified_time" content="2024-08-04T14:24:07.324Z">
+<meta property="article:author" content="Jack Yang">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/f1378bee-5841-4e19-89d0-d461e159a1dc.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>使用Minikube + Ansible部屬微服務 - Jack的後端工程師BLOG</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"nero811.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":["home"]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Coding Is Life</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首頁</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>歸檔</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分類</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>標籤</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>關於</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/undraw_Programming_re_kg9v.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">使用Minikube + Ansible部屬微服務</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-04 22:20" pubdate>
+          2024年8月4日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          823 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          7 分鐘
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">使用Minikube + Ansible部屬微服務</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本篇使用Podman並使用minikube作為k8s cluster，並在minikube上啟動一個ubuntu pod並在裡面安裝Ansible，目標透過Ansible在minikube啟動一個redis pod。</p>
+<h1 id="什麼是-Minikube"><a href="#什麼是-Minikube" class="headerlink" title="什麼是 Minikube"></a>什麼是 Minikube</h1><p><a target="_blank" rel="noopener" href="https://github.com/kubernetes/minikube">Minikube</a> 是由 Google 發布的一個輕量級工具。讓開發者可以在本機上輕易架設一個 Kubernetes Cluster，快速上手 Kubernetes 的指令與環境。<a target="_blank" rel="noopener" href="https://github.com/kubernetes/minikube">Minikube</a> 會在本機上跑起一個 virtual machine，並且在這 VM 裡建立一個 signle-node Kubernetes Cluster，本身並不支援 HA (High availability)，也不推薦在實際應用上運行。</p>
+<h1 id="安裝Minikube"><a href="#安裝Minikube" class="headerlink" title="安裝Minikube"></a>安裝Minikube</h1><h2 id="安裝Podman並安裝Minikube-Plugin"><a href="#安裝Podman並安裝Minikube-Plugin" class="headerlink" title="安裝Podman並安裝Minikube Plugin"></a>安裝Podman並安裝Minikube Plugin</h2><p>Podman安裝與設定可參考以下文章:</p>
+<p><a target="_blank" rel="noopener" href="https://medium.com/@jieshiun/%E5%A6%82%E4%BD%95%E5%9C%A8-windows-%E4%BD%BF%E7%94%A8-podman-desktop-%E5%8F%96%E4%BB%A3-docker-desktop-eca30e4ad308">https:&#x2F;&#x2F;medium.com&#x2F;@jieshiun&#x2F;如何在-windows-使用-podman-desktop-取代-docker-desktop-eca30e4ad308</a></p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/f1378bee-5841-4e19-89d0-d461e159a1dc.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>安裝完Minikube 可在Resource中看到</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/211f417d-3b5e-41ff-b0e4-05ea2398772f.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="運行Minikube"><a href="#運行Minikube" class="headerlink" title="運行Minikube"></a>運行Minikube</h2><ol>
+<li><p>開啟cmd 並輸入指令</p>
+<pre><code class="hljs">minikube start --driver=podman --container-runtime=cri-o (啟動Minikube)
+
+minikube dashboard (開啟dashboard 頁面)
+</code></pre>
+</li>
+<li><p>打開browser並開啟儀表版: <a target="_blank" rel="noopener" href="http://127.0.0.1:56919/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy">http://127.0.0.1:56919/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy</a></p>
+</li>
+</ol>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/59280206-a930-4ef1-b92e-80bec7bb5e13.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<ol>
+<li>在Podman上也能看到minikube已運行</li>
+</ol>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/bea93b06-9f59-444e-9aa5-e29d7f2ab13a.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h1 id="起動Ubuntu-Pod並安裝Ansible"><a href="#起動Ubuntu-Pod並安裝Ansible" class="headerlink" title="起動Ubuntu Pod並安裝Ansible"></a>起動Ubuntu Pod並安裝Ansible</h1><h2 id="建置ubuntu-yml檔"><a href="#建置ubuntu-yml檔" class="headerlink" title="建置ubuntu.yml檔"></a>建置ubuntu.yml檔</h2><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs dts"><span class="hljs-symbol">apiVersion:</span> v1<br><span class="hljs-symbol">kind:</span> Pod<br><span class="hljs-symbol">metadata:</span><br><span class="hljs-symbol">  name:</span> ubuntu<br><span class="hljs-symbol">  labels:</span><br><span class="hljs-symbol">    app:</span> ubuntu<br><span class="hljs-symbol">spec:</span><br><span class="hljs-symbol">  containers:</span><br>    - name: ubuntu<br><span class="hljs-symbol">      image:</span> ubuntu:latest<br><span class="hljs-symbol">      command:</span> [<span class="hljs-string">&quot;/bin/bash&quot;</span>, <span class="hljs-string">&quot;-c&quot;</span>, <span class="hljs-string">&quot;while true; do sleep 3600; done&quot;</span>]<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="運行Ubuntu-Pod"><a href="#運行Ubuntu-Pod" class="headerlink" title="運行Ubuntu Pod"></a>運行Ubuntu Pod</h2><p>cd 到ubuntu.yml檔所在路徑並執行指令</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs applescript">kubectl apply -f ubuntu.yml<br>kubectl exec -<span class="hljs-keyword">it</span> ubuntu <span class="hljs-comment">-- /bin/bash</span><br></code></pre></td></tr></table></figure>
+
+<p>此時我們到minikube dashboard上可以看到Ubuntu Pod已經啟動</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/73630251-cd28-4c29-bfb8-38127558fe87.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>我們在podman上也可以看到Ubuntu pod</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/0da46c9b-d994-4302-b04b-b3ebd3a656e6.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="安裝Ansible"><a href="#安裝Ansible" class="headerlink" title="安裝Ansible"></a>安裝Ansible</h2><p>我們可以由podman進入ubuntu的terminal</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/34af0d63-6176-453c-bcb8-515f79c13148.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h3 id="執行以下指令安裝Ansible與k8s函式庫"><a href="#執行以下指令安裝Ansible與k8s函式庫" class="headerlink" title="執行以下指令安裝Ansible與k8s函式庫"></a>執行以下指令安裝Ansible與k8s函式庫</h3><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs vim">apt-<span class="hljs-built_in">get</span> <span class="hljs-keyword">update</span><br>apt-<span class="hljs-built_in">get</span> install -<span class="hljs-keyword">y</span> software-properties-common<br><span class="hljs-built_in">add</span>-apt-repository --yes --<span class="hljs-keyword">update</span> <span class="hljs-keyword">pp</span><span class="hljs-variable">a:ansible</span>/ansible<br>apt-<span class="hljs-built_in">get</span> install -<span class="hljs-keyword">y</span> ansible<br>curl -LO <span class="hljs-string">&quot;https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl&quot;</span><br>chmod +<span class="hljs-keyword">x</span> ./kubectl<br>mv ./kubectl /usr/local/bin/kubectl<br>apt-<span class="hljs-built_in">get</span> install -<span class="hljs-keyword">y</span> <span class="hljs-keyword">python3</span>-kubernetes<br></code></pre></td></tr></table></figure>
+
+<h3 id="建立-root-kube-config文件"><a href="#建立-root-kube-config文件" class="headerlink" title="建立&#x2F;root&#x2F;.kube&#x2F;config文件"></a>建立&#x2F;root&#x2F;.kube&#x2F;config文件</h3><figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">apiVersion</span><span class="hljs-punctuation">:</span> <span class="hljs-string">v1</span><br><span class="hljs-attribute">clusters</span><span class="hljs-punctuation">:</span><br><span class="hljs-bullet">-</span> <span class="hljs-string">cluster:</span><br>    <span class="hljs-attribute">certificate-authority</span><span class="hljs-punctuation">:</span> <span class="hljs-string">/var/run/secrets/kubernetes.io/serviceaccount/ca.crt</span><br>    <span class="hljs-attribute">server</span><span class="hljs-punctuation">:</span> <span class="hljs-string">https://kubernetes.default.svc</span><br>  <span class="hljs-attribute">name</span><span class="hljs-punctuation">:</span> <span class="hljs-string">kubernetes</span><br><span class="hljs-attribute">contexts</span><span class="hljs-punctuation">:</span><br><span class="hljs-bullet">-</span> <span class="hljs-string">context:</span><br>    <span class="hljs-attribute">cluster</span><span class="hljs-punctuation">:</span> <span class="hljs-string">kubernetes</span><br>    <span class="hljs-attribute">namespace</span><span class="hljs-punctuation">:</span> <span class="hljs-string">default</span><br>    <span class="hljs-attribute">user</span><span class="hljs-punctuation">:</span> <span class="hljs-string">default</span><br>  <span class="hljs-attribute">name</span><span class="hljs-punctuation">:</span> <span class="hljs-string">default</span><br><span class="hljs-attribute">current-context</span><span class="hljs-punctuation">:</span> <span class="hljs-string">default</span><br><span class="hljs-attribute">kind</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Config</span><br><span class="hljs-attribute">preferences</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&#123;&#125;</span><br><span class="hljs-attribute">users</span><span class="hljs-punctuation">:</span><br><span class="hljs-bullet">-</span> <span class="hljs-string">name: default</span><br>  <span class="hljs-attribute">user</span><span class="hljs-punctuation">:</span><br>    <span class="hljs-attribute">token</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&lt;YOUR_SERVICE_ACCOUNT_TOKEN&gt;</span><br><br></code></pre></td></tr></table></figure>
+
+
+<p>獲取服務賬戶令牌並替換 <code>&lt;YOUR_SERVICE_ACCOUNT_TOKEN&gt;</code>：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stata"><span class="hljs-keyword">TOKEN</span>=$(<span class="hljs-keyword">cat</span> /<span class="hljs-keyword">var</span>/<span class="hljs-keyword">run</span>/secrets/kubernetes.io/serviceaccount/<span class="hljs-keyword">token</span>)<br>echo <span class="hljs-variable">$TOKEN</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/5efc9d38-aa1d-4431-b030-0a78dc547b2a.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><p>創建 <code>ansible.cfg</code> 文件：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[defaults]</span><br><span class="hljs-attr">interpreter_python</span> = /usr/bin/python3<br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/781fb772-587c-43d8-b5c4-085b8069af8d.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h1 id="使用ansible部屬Redis"><a href="#使用ansible部屬Redis" class="headerlink" title="使用ansible部屬Redis"></a>使用ansible部屬Redis</h1><h2 id="建置deploy-redis-yml"><a href="#建置deploy-redis-yml" class="headerlink" title="建置deploy_redis.yml"></a>建置deploy_redis.yml</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-meta">---</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">Redis</span> <span class="hljs-string">Pod</span><br>  <span class="hljs-attr">hosts:</span> <span class="hljs-string">localhost</span><br>  <span class="hljs-attr">tasks:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Create</span> <span class="hljs-string">Redis</span> <span class="hljs-string">Pod</span><br>      <span class="hljs-attr">kubernetes.core.k8s:</span><br>        <span class="hljs-attr">state:</span> <span class="hljs-string">present</span><br>        <span class="hljs-attr">definition:</span><br>          <span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br>          <span class="hljs-attr">kind:</span> <span class="hljs-string">Pod</span><br>          <span class="hljs-attr">metadata:</span><br>            <span class="hljs-attr">name:</span> <span class="hljs-string">redis</span><br>            <span class="hljs-attr">labels:</span><br>              <span class="hljs-attr">app:</span> <span class="hljs-string">redis</span><br>          <span class="hljs-attr">spec:</span><br>            <span class="hljs-attr">containers:</span><br>            <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">redis</span><br>              <span class="hljs-attr">image:</span> <span class="hljs-string">docker.io/redis:latest</span><br>              <span class="hljs-attr">ports:</span><br>              <span class="hljs-bullet">-</span> <span class="hljs-attr">containerPort:</span> <span class="hljs-number">6379</span><br><br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/a7e2d1db-ad78-4400-b877-8d774a4e2f1b.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>此時的目錄結構為:</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/a7a9b9b1-20bb-4cb2-82aa-d72bc1a9c7f9.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="執行-Ansible-Playbook"><a href="#執行-Ansible-Playbook" class="headerlink" title="執行 Ansible Playbook"></a>執行 Ansible Playbook</h2><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli">ansible-playbook <span class="hljs-keyword">deploy</span>_redis.yml<br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/c542eb5e-f0cf-4225-b6f8-c27c9e3e425d.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>此時看dashboard就可以看到成功使用ansible playbook建立一個redis pod</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/ab22cff3-8034-44c0-8b8c-155a96892f84.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>於podman中也可以看到redis pod</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/a2d9d764-5d0a-4680-8234-2e6283906530.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>執行playbook時若出現以下error表示權限不足需參考下面賦予Pod權限標題:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs swift">fatal: [localhost]: <span class="hljs-type">FAILED</span>! <span class="hljs-operator">=&gt;</span> &#123;<span class="hljs-string">&quot;changed&quot;</span>: <span class="hljs-literal">false</span>, <span class="hljs-string">&quot;msg&quot;</span>: <span class="hljs-string">&quot;Failed to retrieve requested object: b&#x27;&#123;<span class="hljs-subst">\&quot;</span>kind<span class="hljs-subst">\&quot;</span>:<span class="hljs-subst">\&quot;</span>Status<span class="hljs-subst">\&quot;</span>,<span class="hljs-subst">\&quot;</span>apiVersion<span class="hljs-subst">\&quot;</span>:<span class="hljs-subst">\&quot;</span>v1<span class="hljs-subst">\&quot;</span>,<span class="hljs-subst">\&quot;</span>metadata<span class="hljs-subst">\&quot;</span>:&#123;&#125;,<span class="hljs-subst">\&quot;</span>status<span class="hljs-subst">\&quot;</span>:<span class="hljs-subst">\&quot;</span>Failure<span class="hljs-subst">\&quot;</span>,<span class="hljs-subst">\&quot;</span>message<span class="hljs-subst">\&quot;</span>:<span class="hljs-subst">\&quot;</span>pods <span class="hljs-subst">\\</span><span class="hljs-subst">\\</span><span class="hljs-subst">\&quot;</span>redis<span class="hljs-subst">\\</span><span class="hljs-subst">\\</span><span class="hljs-subst">\&quot;</span> is forbidden: User <span class="hljs-subst">\\</span><span class="hljs-subst">\\</span><span class="hljs-subst">\&quot;</span>system:serviceaccount:default:default<span class="hljs-subst">\\</span><span class="hljs-subst">\\</span><span class="hljs-subst">\&quot;</span> cannot get resource <span class="hljs-subst">\\</span><span class="hljs-subst">\\</span><span class="hljs-subst">\&quot;</span>pods<span class="hljs-subst">\\</span><span class="hljs-subst">\\</span><span class="hljs-subst">\&quot;</span> in API group <span class="hljs-subst">\\</span><span class="hljs-subst">\\</span><span class="hljs-subst">\&quot;</span><span class="hljs-subst">\\</span><span class="hljs-subst">\\</span><span class="hljs-subst">\&quot;</span> at the cluster scope<span class="hljs-subst">\&quot;</span>,<span class="hljs-subst">\&quot;</span>reason<span class="hljs-subst">\&quot;</span>:<span class="hljs-subst">\&quot;</span>Forbidden<span class="hljs-subst">\&quot;</span>,<span class="hljs-subst">\&quot;</span>details<span class="hljs-subst">\&quot;</span>:&#123;<span class="hljs-subst">\&quot;</span>name<span class="hljs-subst">\&quot;</span>:<span class="hljs-subst">\&quot;</span>redis<span class="hljs-subst">\&quot;</span>,<span class="hljs-subst">\&quot;</span>kind<span class="hljs-subst">\&quot;</span>:<span class="hljs-subst">\&quot;</span>pods<span class="hljs-subst">\&quot;</span>&#125;,<span class="hljs-subst">\&quot;</span>code<span class="hljs-subst">\&quot;</span>:403&#125;<span class="hljs-subst">\\</span>n&#x27;&quot;</span>, <span class="hljs-string">&quot;reason&quot;</span>: <span class="hljs-string">&quot;Forbidden&quot;</span>&#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="賦予Ubuntu-Pod-ServiceAccount權限"><a href="#賦予Ubuntu-Pod-ServiceAccount權限" class="headerlink" title="賦予Ubuntu Pod ServiceAccount權限"></a>賦予Ubuntu Pod ServiceAccount權限</h1><p>說明: 若我們想要使用ubuntu上的ansible部屬一個服務到minikube上，我們就必須先賦予ubuntu pod權限</p>
+<h2 id="確認-Pod-使用的-ServiceAccount"><a href="#確認-Pod-使用的-ServiceAccount" class="headerlink" title="確認 Pod 使用的 ServiceAccount"></a>確認 Pod 使用的 ServiceAccount</h2><p>使用以下指令確認Ubuntu Pod使用的ServiceAccount</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">kubectl <span class="hljs-built_in">get</span> pod ubuntu -o yaml<br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/1c129f5b-63ab-4046-a53f-c11a60265ca0.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="創建或更新-Role-和-RoleBinding"><a href="#創建或更新-Role-和-RoleBinding" class="headerlink" title="創建或更新 Role 和 RoleBinding"></a>創建或更新 Role 和 RoleBinding</h2><h3 id="role-yml"><a href="#role-yml" class="headerlink" title="role.yml"></a>role.yml</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs dts"><span class="hljs-symbol">apiVersion:</span> rbac.authorization.k8s.io/v1<br><span class="hljs-symbol">kind:</span> Role<br><span class="hljs-symbol">metadata:</span><br><span class="hljs-symbol">  name:</span> pod-manager-role<br><span class="hljs-symbol">  namespace:</span> default<br><span class="hljs-symbol">rules:</span><br>  - apiGroups: [<span class="hljs-string">&quot;&quot;</span>]<br><span class="hljs-symbol">    resources:</span> [<span class="hljs-string">&quot;pods&quot;</span>]<br><span class="hljs-symbol">    verbs:</span> [<span class="hljs-string">&quot;get&quot;</span>, <span class="hljs-string">&quot;list&quot;</span>, <span class="hljs-string">&quot;watch&quot;</span>, <span class="hljs-string">&quot;create&quot;</span>, <span class="hljs-string">&quot;update&quot;</span>, <span class="hljs-string">&quot;patch&quot;</span>, <span class="hljs-string">&quot;delete&quot;</span>]<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="rolebinding-yml"><a href="#rolebinding-yml" class="headerlink" title="rolebinding.yml"></a>rolebinding.yml</h3><figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">apiVersion</span><span class="hljs-punctuation">:</span> <span class="hljs-string">rbac.authorization.k8s.io/v1</span><br><span class="hljs-attribute">kind</span><span class="hljs-punctuation">:</span> <span class="hljs-string">RoleBinding</span><br><span class="hljs-attribute">metadata</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">name</span><span class="hljs-punctuation">:</span> <span class="hljs-string">pod-manager-binding</span><br>  <span class="hljs-attribute">namespace</span><span class="hljs-punctuation">:</span> <span class="hljs-string">default</span><br><span class="hljs-attribute">subjects</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">kind: ServiceAccount</span><br>    <span class="hljs-attribute">name</span><span class="hljs-punctuation">:</span> <span class="hljs-string">default</span><br>    <span class="hljs-attribute">namespace</span><span class="hljs-punctuation">:</span> <span class="hljs-string">default</span><br><span class="hljs-attribute">roleRef</span><span class="hljs-punctuation">:</span><br>  <span class="hljs-attribute">kind</span><span class="hljs-punctuation">:</span> <span class="hljs-string">Role</span><br>  <span class="hljs-attribute">name</span><span class="hljs-punctuation">:</span> <span class="hljs-string">pod-manager-role</span><br>  <span class="hljs-attribute">apiGroup</span><span class="hljs-punctuation">:</span> <span class="hljs-string">rbac.authorization.k8s.io</span><br><br></code></pre></td></tr></table></figure>
+
+<h3 id="執行指令"><a href="#執行指令" class="headerlink" title="執行指令"></a>執行指令</h3><figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs coq">kubectl <span class="hljs-built_in">apply</span> -f role.yml<br>kubectl <span class="hljs-built_in">apply</span> -f rolebinding.yml<br></code></pre></td></tr></table></figure>
+
+<h2 id="確認權限"><a href="#確認權限" class="headerlink" title="確認權限"></a>確認權限</h2><figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs oxygene">kubectl auth can-i <span class="hljs-keyword">create</span> pods --<span class="hljs-keyword">as</span>=system:serviceaccount:<span class="hljs-keyword">default</span>:<span class="hljs-keyword">default</span> --<span class="hljs-keyword">namespace</span>=<span class="hljs-keyword">default</span><br>kubectl auth can-i patch pods --<span class="hljs-keyword">as</span>=system:serviceaccount:<span class="hljs-keyword">default</span>:<span class="hljs-keyword">default</span> --<span class="hljs-keyword">namespace</span>=<span class="hljs-keyword">default</span><br></code></pre></td></tr></table></figure>
+
+
+<p>這兩個命令應該返回 <code>yes</code>，表示 <code>default</code> ServiceAccount 具有相應的權限。</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8Minikube_+_Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/de2cf3f7-aec7-4541-bd84-1b5b009879f2.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>使用Minikube + Ansible部屬微服務</div>
+      <div>https://nero811.github.io/2024/08/04/使用Minikube + Ansible部屬微服務/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Jack Yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>發布於</div>
+          <div>2024年8月4日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>許可協議</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/07/31/Spring-Session%20With%20Redis%20%E9%81%94%E5%88%B0Session%20%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/" title="Spring-Session With Redis 達到Session 集中式處理">
+                        <span class="hidden-mobile">Spring-Session With Redis 達到Session 集中式處理</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目錄</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜尋</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">關鍵字</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允許 JavaScript 運行的環境下瀏覽效果更佳</div>
+  </noscript>
+</body>
+</html>
