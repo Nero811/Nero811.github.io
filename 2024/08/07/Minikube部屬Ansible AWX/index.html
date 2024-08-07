@@ -1,0 +1,746 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-TW" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icons8-code-48.png">
+  <link rel="icon" href="/img/icons8-code-48.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Jack Yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言繼上一篇我們部屬完Minikube後，本篇目標接著部屬Ansible AWX到Minikube，並且透過Ansible AWX API來啟動template 安裝Ansible AWX 安裝helm&amp;設定環境變數  1curl https:&#x2F;&#x2F;get.helm.sh&#x2F;helm-v3.10.2-windows-amd64.tar.gz   依序執行以下指令  12helm repo ad">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Minikube部屬Ansible AWX">
+<meta property="og:url" content="https://nero811.github.io/2024/08/07/Minikube%E9%83%A8%E5%B1%ACAnsible%20AWX/index.html">
+<meta property="og:site_name" content="Jack的後端工程師BLOG">
+<meta property="og:description" content="前言繼上一篇我們部屬完Minikube後，本篇目標接著部屬Ansible AWX到Minikube，並且透過Ansible AWX API來啟動template 安裝Ansible AWX 安裝helm&amp;設定環境變數  1curl https:&#x2F;&#x2F;get.helm.sh&#x2F;helm-v3.10.2-windows-amd64.tar.gz   依序執行以下指令  12helm repo ad">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/1e8e0bce-e080-4f85-8d02-512ab8eefd98.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/7242c821-6e66-4807-a317-54fb84cac507.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/39fe935d-8b09-4e3a-921f-e1887af5c735.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/7a9fb891-3559-437d-8b73-5f3dcfc8e70d.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/81993e2a-a7e5-4343-ac9e-1e5ebf958eb1.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/ae6bdcf3-4090-4820-b3ee-7db6fd49ad2a.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/7898fdd6-dfd1-4241-9bf7-b2a8afd64a8b.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/e79ef271-ad61-48dd-8259-7c68dbb5d842.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/5194ab3b-ad02-4e84-908e-b3680950613e.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/a000f5b6-8833-4e97-a984-d67c61f7caa7.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/c2adc51c-ede8-4c11-8678-ae91748a0c21.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/02bbd2d8-df30-4f69-9385-710a31ce362d.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/264ce401-4f3e-4788-8371-c2901de13404.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/d85fbec3-a536-4c51-98d9-6ac523822128.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/cae8d8ca-ed98-4d1a-9daa-b30e6e4830df.webp">
+<meta property="article:published_time" content="2024-08-07T15:32:07.639Z">
+<meta property="article:modified_time" content="2024-08-07T15:34:52.365Z">
+<meta property="article:author" content="Jack Yang">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/1e8e0bce-e080-4f85-8d02-512ab8eefd98.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Minikube部屬Ansible AWX - Jack的後端工程師BLOG</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"nero811.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":["home"]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Coding Is Life</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首頁</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>歸檔</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分類</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>標籤</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>關於</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/undraw_Programming_re_kg9v.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">Minikube部屬Ansible AWX</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-07 23:32" pubdate>
+          2024年8月7日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          556 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          5 分鐘
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Minikube部屬Ansible AWX</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>繼上一篇我們部屬完Minikube後，本篇目標接著部屬Ansible AWX到Minikube，並且透過Ansible AWX API來啟動template</p>
+<h1 id="安裝Ansible-AWX"><a href="#安裝Ansible-AWX" class="headerlink" title="安裝Ansible AWX"></a>安裝Ansible AWX</h1><ol>
+<li>安裝helm&amp;設定環境變數</li>
+</ol>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">curl</span> https://get.helm.sh/helm-v3.<span class="hljs-number">10</span>.<span class="hljs-number">2</span>-windows-amd64.tar.gz<br></code></pre></td></tr></table></figure>
+
+<ol>
+<li>依序執行以下指令</li>
+</ol>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">helm repo <span class="hljs-keyword">add</span> awx-<span class="hljs-keyword">operator</span> https://ansible.github.io/awx-<span class="hljs-keyword">operator</span>/<br>helm install — generate-<span class="hljs-type">name</span> awx-<span class="hljs-keyword">operator</span>/awx-<span class="hljs-keyword">operator</span><br></code></pre></td></tr></table></figure>
+
+<ol>
+<li>建立awx-demo.yaml 並執行</li>
+</ol>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs dts"><span class="hljs-symbol">apiVersion:</span> awx.ansible.com/v1beta1<br><span class="hljs-symbol">kind:</span> AWX<br><span class="hljs-symbol">metadata:</span><br><span class="hljs-symbol">  name:</span> awx-demo<br><span class="hljs-symbol">spec:</span><br><span class="hljs-symbol">  service_type:</span> nodeport<br><br></code></pre></td></tr></table></figure>
+
+<p>kubectl apply -f awx-demo.yaml</p>
+<ol>
+<li>確認服務啟動</li>
+</ol>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">kubectl <span class="hljs-built_in">get</span> svc<br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/1e8e0bce-e080-4f85-8d02-512ab8eefd98.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/7242c821-6e66-4807-a317-54fb84cac507.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<ol>
+<li>獲取minikube pod service Url:</li>
+</ol>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ada">minikube service <span class="hljs-comment">--url &lt;service_name&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/39fe935d-8b09-4e3a-921f-e1887af5c735.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<ol>
+<li>使用default admin登入AWX</li>
+</ol>
+<p>ID: admin</p>
+<p>密碼使用以下指令並，並將結果透過base64 decode獲得</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">kubectl <span class="hljs-keyword">get</span> secret awx-demo-<span class="hljs-keyword">admin</span>-<span class="hljs-keyword">password</span> -o jsonpath=’&#123;.data.<span class="hljs-keyword">password</span>&#125;’<span class="hljs-comment">-- getpassword</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/7a9fb891-3559-437d-8b73-5f3dcfc8e70d.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/81993e2a-a7e5-4343-ac9e-1e5ebf958eb1.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/ae6bdcf3-4090-4820-b3ee-7db6fd49ad2a.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>本文部屬是參考以下文章:</p>
+<p><a target="_blank" rel="noopener" href="https://medium.com/@caceresabelanibal/install-ansible-awx-on-kubernetes-docker-desktop-for-windows-97406dd64ab5">https:&#x2F;&#x2F;medium.com&#x2F;@caceresabelanibal&#x2F;install-ansible-awx-on-kubernetes-docker-desktop-for-windows-97406dd64ab5</a></p>
+<h1 id="AWX-簡介"><a href="#AWX-簡介" class="headerlink" title="AWX 簡介"></a>AWX 簡介</h1><h2 id="Project"><a href="#Project" class="headerlink" title="Project"></a>Project</h2><p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/7898fdd6-dfd1-4241-9bf7-b2a8afd64a8b.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>Ansible playbook 的邏輯集合。</p>
+<p>我們通過以下兩種方式管理 playbook 和 playbook 目錄：</p>
+<ol>
+<li><p>將placybook手動放置在伺服器上的專案基礎路徑下，預設路徑是&#x2F;var&#x2F;lib&#x2F;awx&#x2F;projects(可變更)</p>
+</li>
+<li><p>將 playbook 放置到 AWX 支援的源代碼管理 (SCM) 系統中，包括 Git、Subversion 和 Red Hat Insights。</p>
+</li>
+</ol>
+<p>詳細可參考官方文件:</p>
+<p><a target="_blank" rel="noopener" href="https://ansible.readthedocs.io/projects/awx/en/latest/userguide/projects.html">https://ansible.readthedocs.io/projects/awx/en/latest/userguide/projects.html</a></p>
+<h2 id="Inventories"><a href="#Inventories" class="headerlink" title="Inventories"></a>Inventories</h2><p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/e79ef271-ad61-48dd-8259-7c68dbb5d842.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>Inventories是一個主機的集合，這些主機是執行作業的對象，與 Ansible 清單文件相同。清單被劃分為多個組，這些組包含實際的主機。組可以手動添加，通過在 AWX 中輸入主機名稱，或從其支持的雲端供應商獲取。</p>
+<p>詳細可參考官方文件:</p>
+<p><a target="_blank" rel="noopener" href="https://ansible.readthedocs.io/projects/awx/en/latest/userguide/inventories.html">https://ansible.readthedocs.io/projects/awx/en/latest/userguide/inventories.html</a></p>
+<h2 id="Job-Templates"><a href="#Job-Templates" class="headerlink" title="Job Templates"></a>Job Templates</h2><p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/5194ab3b-ad02-4e84-908e-b3680950613e.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>AWX 的模板（Template）是一個定義和參數集，用於運行 Ansible 作業。模板在多次執行相同作業時非常有用，並且有助於重用 Ansible playbook 內容以及團隊之間的協作。以下是有關 AWX 模板的一些詳細介紹：</p>
+<h3 id="作業範本的功能"><a href="#作業範本的功能" class="headerlink" title="作業範本的功能"></a>作業範本的功能</h3><ol>
+<li><p>標準化執行：</p>
+</li>
+<li><p>重用和協作：</p>
+</li>
+<li><p>自動化和編排：</p>
+</li>
+</ol>
+<h3 id="如何使用模板"><a href="#如何使用模板" class="headerlink" title="如何使用模板"></a>如何使用模板</h3><ul>
+<li><p>創建模板：</p>
+</li>
+<li><p>管理模板：</p>
+</li>
+<li><p>運行模板：</p>
+</li>
+</ul>
+<p>參考官方文件:</p>
+<p><a target="_blank" rel="noopener" href="https://ansible.readthedocs.io/projects/awx/en/latest/userguide/job_templates.html">https://ansible.readthedocs.io/projects/awx/en/latest/userguide/job_templates.html</a></p>
+<h1 id="操作AWX-API啟動Template"><a href="#操作AWX-API啟動Template" class="headerlink" title="操作AWX API啟動Template"></a>操作AWX API啟動Template</h1><p>當我們輸入<a href="http://domain:port/api/v2，就可以看到AWX自己的原生REST">http://domain:port/api/v2，就可以看到AWX自己的原生REST</a> API</p>
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/a000f5b6-8833-4e97-a984-d67c61f7caa7.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="STEPS"><a href="#STEPS" class="headerlink" title="STEPS"></a>STEPS</h2><ol>
+<li>POST api&#x2F;v2&#x2F;tokens</li>
+</ol>
+<p> 取得Token</p>
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/c2adc51c-ede8-4c11-8678-ae91748a0c21.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<ol>
+<li>GET api&#x2F;v2&#x2F;job_templates</li>
+</ol>
+<p>帶入1. 的Token取得 templates list</p>
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/02bbd2d8-df30-4f69-9385-710a31ce362d.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<ol>
+<li>POST api&#x2F;v2&#x2F;job_templates&#x2F;{id}&#x2F;launch&#x2F;</li>
+</ol>
+<p>帶入1. 的Token、2.獲得的templateId啟動 template</p>
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/264ce401-4f3e-4788-8371-c2901de13404.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/d85fbec3-a536-4c51-98d9-6ac523822128.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/cae8d8ca-ed98-4d1a-9daa-b30e6e4830df.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Minikube部屬Ansible AWX</div>
+      <div>https://nero811.github.io/2024/08/07/Minikube部屬Ansible AWX/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Jack Yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>發布於</div>
+          <div>2024年8月7日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>許可協議</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/04/%E4%BD%BF%E7%94%A8Minikube%20+%20Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/" title="使用Minikube + Ansible部屬微服務">
+                        <span class="hidden-mobile">使用Minikube + Ansible部屬微服務</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目錄</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜尋</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">關鍵字</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允許 JavaScript 運行的環境下瀏覽效果更佳</div>
+  </noscript>
+</body>
+</html>
