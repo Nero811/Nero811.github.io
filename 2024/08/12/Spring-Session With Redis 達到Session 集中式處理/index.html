@@ -1,0 +1,689 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-TW" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icons8-code-48.png">
+  <link rel="icon" href="/img/icons8-code-48.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Jack Yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言:我們都知道session是放在application端，當application 中斷&#x2F;重啟時或是browser關閉&#x2F;登出時，session就會消失。筆者工作上是使用Keycloak做為Authenticaion server，並採取以下常見的架構。  由於Nginx預設附載平衡機制是使用(round robin)，會導致一種情境: 當使用者透過Tomcat 1登入Ser">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring-Session With Redis 達到Session 集中式處理">
+<meta property="og:url" content="https://nero811.github.io/2024/08/12/Spring-Session%20With%20Redis%20%E9%81%94%E5%88%B0Session%20%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/index.html">
+<meta property="og:site_name" content="Jack的後端工程師BLOG">
+<meta property="og:description" content="前言:我們都知道session是放在application端，當application 中斷&#x2F;重啟時或是browser關閉&#x2F;登出時，session就會消失。筆者工作上是使用Keycloak做為Authenticaion server，並採取以下常見的架構。  由於Nginx預設附載平衡機制是使用(round robin)，會導致一種情境: 當使用者透過Tomcat 1登入Ser">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://nero811.github.io/img/default.webp">
+<meta property="article:published_time" content="2024-08-12T14:29:52.325Z">
+<meta property="article:modified_time" content="2024-08-12T14:30:14.084Z">
+<meta property="article:author" content="Jack Yang">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://nero811.github.io/img/default.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Spring-Session With Redis 達到Session 集中式處理 - Jack的後端工程師BLOG</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"nero811.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":["home"]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Coding Is Life</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首頁</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>歸檔</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分類</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>標籤</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>關於</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.webp') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">Spring-Session With Redis 達到Session 集中式處理</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-12 22:29" pubdate>
+          2024年8月12日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          12 分鐘
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Spring-Session With Redis 達到Session 集中式處理</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言:"></a>前言:</h1><p>我們都知道session是放在application端，當application 中斷&#x2F;重啟時或是browser關閉&#x2F;登出時，session就會消失。筆者工作上是使用Keycloak做為Authenticaion server，並採取以下常見的架構。</p>
+<p><img src="/./image/Spring-Session_With_Redis_%E9%81%94%E5%88%B0Session_%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/2654cfb0-c527-4c64-99e5-3473cb1dcf30.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>由於Nginx預設附載平衡機制是使用(round robin)，會導致一種情境: 當使用者透過Tomcat 1登入Server後獲得一組session，但是因為附載平衡而導到Tomcat 2。這時因為Tomcat 2中沒有Tomcat 1的session而導致認證失敗(401)。這就是經典的Session分布式一致性 問題。</p>
+<h1 id="解決辦法-Session-集中式處理"><a href="#解決辦法-Session-集中式處理" class="headerlink" title="解決辦法 - Session 集中式處理"></a>解決辦法 - Session 集中式處理</h1><p>使用Spring Session 將Application傳給前端的session先儲存到Redis當中，當前端只要帶著這個session去訪問Application，Application就會先去跟Redis確認session是否存在，若存在就會放行不需再次驗證，若不存在就會重新導到Keycloak進行認證。</p>
+<p>這麼做除了可以解決Session分布式一致性問題 之外還有另外一個優點，及使Application重啟&#x2F;中斷也不會因為session消失，而導致使用者需要重新進行認證。</p>
+<p><img src="/./image/Spring-Session_With_Redis_%E9%81%94%E5%88%B0Session_%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/59b558cd-adf4-4097-83ae-3b8491f0a685.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>除了Session 集中式處理還有其他三種處理方式，可參考:</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzkzODE3OTI0Ng==&mid=2247490886&idx=1&sn=415756e141a6902e128fbfda0a935ad8&source=41#wechat_redirect">https://mp.weixin.qq.com/s?__biz&#x3D;MzkzODE3OTI0Ng&#x3D;&#x3D;&amp;mid&#x3D;2247490886&amp;idx&#x3D;1&amp;sn&#x3D;415756e141a6902e128fbfda0a935ad8&amp;source&#x3D;41#wechat_redirect</a></p>
+<h1 id="實作說明"><a href="#實作說明" class="headerlink" title="實作說明"></a>實作說明</h1><p>Spring有提供Spring-Session來實現Session 集中式處理，Spring-Session的實現方式有兩種:</p>
+<ol>
+<li><p>在application.properties中加入spring-session設定</p>
+</li>
+<li><p>使用@EnableRedisHttpSession annotation</p>
+</li>
+</ol>
+<p>以上兩種方式不能同時使用，@EnableRedisHttpSession設定的優先度大於pplication.properties</p>
+<p>可參考官方文件:</p>
+<p><a target="_blank" rel="noopener" href="https://docs.spring.io/spring-session/reference/guides/boot-redis.html">https://docs.spring.io/spring-session/reference/guides/boot-redis.html</a> </p>
+<p><a target="_blank" rel="noopener" href="https://docs.spring.io/spring-session/reference/http-session.html#httpsession">https://docs.spring.io/spring-session/reference/http-session.html#httpsession</a> </p>
+<h2 id="pom"><a href="#pom" class="headerlink" title="pom"></a>pom</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-data-redis<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.session<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-session-data-redis<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h1 id="1-使用application-properties"><a href="#1-使用application-properties" class="headerlink" title="1. 使用application.properties"></a>1. 使用application.properties</h1><h2 id="application-properties"><a href="#application-properties" class="headerlink" title="application.properties"></a>application.properties</h2><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-comment"># Session timeout. If a duration suffix is not specified, seconds is used.</span><br><span class="hljs-attr">server.servlet.session.timeout</span>=<span class="hljs-number">5</span>m<br><br><span class="hljs-comment"># Sessions flush mode.</span><br><span class="hljs-comment">#spring.session.redis.flush-mode=on_save</span><br><br><span class="hljs-comment"># Namespace for keys used to store sessions.</span><br><span class="hljs-attr">spring.session.redis.namespace</span>=spring:session<br></code></pre></td></tr></table></figure>
+
+<h2 id="server-servlet-session"><a href="#server-servlet-session" class="headerlink" title="server.servlet.session"></a>server.servlet.session</h2><p>定義了 session 的過期時間，session過期時會redis的key也會expire。若時間單位沒有指定，則預設以秒(s)為單位。</p>
+<h2 id="spring-session-redis-flush"><a href="#spring-session-redis-flush" class="headerlink" title="spring.session.redis.flush"></a>spring.session.redis.flush</h2><p>session flush mode 定義了 Spring Session 何時將 session 資訊寫入 Redis，常用的有兩種模式:</p>
+<h3 id="on-save"><a href="#on-save" class="headerlink" title="on_save"></a>on_save</h3><p>只有在 session  update、save時，才會將 session 資訊同步寫入 Redis。</p>
+<h3 id="immediate"><a href="#immediate" class="headerlink" title="immediate"></a>immediate</h3><p>每次 request 結束後立即將 session 資訊寫入 Redis，不管該 session 是否有變更。這保證了資料的一致性，但代價是增加了 Redis 的I&#x2F;O。</p>
+<h2 id="spring-session-redis-namespace"><a href="#spring-session-redis-namespace" class="headerlink" title="spring.session.redis.namespace"></a>spring.session.redis.namespace</h2><p>定義 session 儲存於redis的 key 命名方式</p>
+<h1 id="2-使用-EnableRedisHttpSession-annotation"><a href="#2-使用-EnableRedisHttpSession-annotation" class="headerlink" title="2. 使用@EnableRedisHttpSession annotation"></a>2. 使用@EnableRedisHttpSession annotation</h1><h2 id="RedisConfig"><a href="#RedisConfig" class="headerlink" title="RedisConfig"></a>RedisConfig</h2><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs less"><span class="hljs-variable">@Configuration</span><br><span class="hljs-variable">@EnableRedisHttpSession</span>(redisNamespace = <span class="hljs-string">&quot;test:session&quot;</span>)<br>public class RedisConfig &#123;<br><br>    <span class="hljs-variable">@Bean</span><br>    public LettuceConnectionFactory <span class="hljs-built_in">connectionFactory</span>() &#123;<br>        <span class="hljs-selector-tag">return</span> <span class="hljs-selector-tag">new</span> <span class="hljs-selector-tag">LettuceConnectionFactory</span>();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="驗證"><a href="#驗證" class="headerlink" title="驗證"></a>驗證</h1><h2 id="準備事項"><a href="#準備事項" class="headerlink" title="準備事項"></a>準備事項</h2><h3 id="html"><a href="#html" class="headerlink" title="html"></a>html</h3><p>這邊我先準備了另外一個Spring Boot程式，並在pom檔中加入thymeleaf dependency，</p>
+<p>並使用8082 port啟動</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;zh-Hant-TW&quot;</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;http://localhost:8081/&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;authLink&quot;</span>&gt;</span>登入驗證<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/Spring-Session_With_Redis_%E9%81%94%E5%88%B0Session_%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/ffef3b21-498e-4263-a09d-2e2813ea945b.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h3 id="Spring-Security"><a href="#Spring-Security" class="headerlink" title="Spring Security"></a>Spring Security</h3><p>撰寫一支Spring Security程式，並使用8081 port啟動</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><code class="hljs livescript">package com.example.demo_oauth.config;<br><br><br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.classic.HttpClient;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.impl.classic.HttpClients;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.io.HttpClientConnectionManager;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.ssl.TrustAllStrategy;<br><span class="hljs-keyword">import</span> org.apache.hc.core5.ssl.SSLContexts;<br><br><span class="hljs-keyword">import</span> java.security.KeyManagementException;<br><span class="hljs-keyword">import</span> java.security.KeyStoreException;<br><span class="hljs-keyword">import</span> java.security.NoSuchAlgorithmException;<br><br><span class="hljs-keyword">import</span> javax.net.ssl.SSLContext;<br><br><span class="hljs-keyword">import</span> org.springframework.beans.factory.annotation.Autowired;<br><span class="hljs-keyword">import</span> org.springframework.beans.factory.annotation.Value;<br><span class="hljs-keyword">import</span> org.springframework.context.annotation.Bean;<br><span class="hljs-keyword">import</span> org.springframework.context.annotation.Configuration;<br><span class="hljs-keyword">import</span> org.springframework.http.client.ClientHttpRequestFactory;<br><span class="hljs-keyword">import</span> org.springframework.http.client.HttpComponentsClientHttpRequestFactory;<br><span class="hljs-keyword">import</span> org.springframework.security.config.Customizer;<br><span class="hljs-keyword">import</span> org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;<br><span class="hljs-keyword">import</span> org.springframework.security.config.annotation.web.builders.HttpSecurity;<br><span class="hljs-keyword">import</span> org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.jwt.JwtDecoder;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.jwt.NimbusJwtDecoder;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;<br><span class="hljs-keyword">import</span> org.springframework.security.web.SecurityFilterChain;<br><span class="hljs-keyword">import</span> org.springframework.web.client.RestTemplate;<br><span class="hljs-keyword">import</span> org.springframework.web.cors.CorsConfiguration;<br><span class="hljs-keyword">import</span> org.springframework.web.cors.CorsConfigurationSource;<br><span class="hljs-keyword">import</span> org.springframework.web.cors.UrlBasedCorsConfigurationSource;<br><br>@Configuration<br>@EnableMethodSecurity<br>@EnableWebSecurity<br>public <span class="hljs-keyword">class</span> <span class="hljs-title class_">SecurityConfig</span> &#123;<br><br>    @Value(<span class="hljs-string">&quot;$&#123;spring.security.oauth2.client.provider.keycloak.issuer-uri&#125;&quot;</span>)<br>    private <span class="hljs-built_in">String</span> issuerUri;<br><br>    @Autowired<br>    private JwtAuthenticationConverter jwtAuthenticationConverter;<br><br>    @Bean<br>    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception &#123;<br>        http.csrf(csrf -&gt; csrf.disable())<br>            .cors(cors -&gt; cors<br>                    .configurationSource(corsConfigurationSource()));<br><br>        http.authorizeHttpRequests(authorize -&gt; authorize.requestMatchers(<span class="hljs-string">&quot;/login&quot;</span>).permitAll().anyRequest().authenticated())<br><span class="hljs-regexp">//                .oauth2ResourceServer((oauth2) -&gt; oauth2.jwt(jwt -&gt; jwt.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter))) //</span> 使用jwtDecoder向Author Server驗證Accesstion，並使用自定義的jwtConverter，jwt decode後將權限收集進Collection&lt;? <span class="hljs-keyword">extends</span> GrantedAuthority&gt;中<br>                .oauth2ResourceServer<span class="hljs-function"><span class="hljs-params">((oauth2) -&gt; oauth2.jwt(jwt -&gt; jwt.decoder(jwtDecoder())))</span> // 驗證 <span class="hljs-title">access</span> <span class="hljs-title">token</span></span><br><span class="hljs-function">                .<span class="hljs-title">oauth2Login</span><span class="hljs-params">(Customizer.withDefaults())</span>; // 使用表單登入</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">http</span>.<span class="hljs-title">oauth2Login</span><span class="hljs-params">(oauth2 -&gt; oauth2.defaultSuccessUrl(<span class="hljs-string">&quot;/checkLogin&quot;</span>, <span class="hljs-literal">true</span>))</span>;</span><br><span class="hljs-function">        <span class="hljs-title">return</span> <span class="hljs-title">http</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">    &#125;</span><br><span class="hljs-function"></span><br><span class="hljs-function">    <span class="hljs-title">private</span> <span class="hljs-title">JwtDecoder</span> <span class="hljs-title">jwtDecoder</span><span class="hljs-params">()</span> &#123;</span><br><span class="hljs-function">        <span class="hljs-title">RestTemplate</span> <span class="hljs-title">restTemplate</span> = <span class="hljs-title">new</span> <span class="hljs-title">RestTemplate</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        <span class="hljs-title">restTemplate</span>.<span class="hljs-title">setRequestFactory</span><span class="hljs-params">(trustAllClientHttpRequestFactory())</span>;</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">return</span> <span class="hljs-title">NimbusJwtDecoder</span>.<span class="hljs-title">withIssuerLocation</span><span class="hljs-params">(issuerUri)</span>.<span class="hljs-title">restOperations</span><span class="hljs-params">(restTemplate)</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">    &#125;</span><br><span class="hljs-function"></span><br><span class="hljs-function">    <span class="hljs-title">private</span> <span class="hljs-title">ClientHttpRequestFactory</span> <span class="hljs-title">trustAllClientHttpRequestFactory</span><span class="hljs-params">()</span> &#123;</span><br><span class="hljs-function">        <span class="hljs-title">SSLContext</span> <span class="hljs-title">sslcontext</span> = <span class="hljs-title">null</span>;</span><br><span class="hljs-function">        <span class="hljs-title">try</span> &#123;</span><br><span class="hljs-function">            <span class="hljs-title">sslcontext</span> = <span class="hljs-title">SSLContexts</span>.<span class="hljs-title">custom</span><span class="hljs-params">()</span>.<span class="hljs-title">loadTrustMaterial</span><span class="hljs-params">(<span class="hljs-literal">null</span>, <span class="hljs-keyword">new</span> TrustAllStrategy())</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        &#125; <span class="hljs-title">catch</span> <span class="hljs-params">(KeyManagementException | NoSuchAlgorithmException | KeyStoreException e)</span> &#123;</span><br><span class="hljs-function">            <span class="hljs-title">e</span>.<span class="hljs-title">printStackTrace</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        &#125;</span><br><span class="hljs-function">        <span class="hljs-title">SSLConnectionSocketFactory</span> <span class="hljs-title">sslSocketFactory</span> = <span class="hljs-title">SSLConnectionSocketFactoryBuilder</span>.<span class="hljs-title">create</span><span class="hljs-params">()</span>.<span class="hljs-title">setSslContext</span><span class="hljs-params">(sslcontext)</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        <span class="hljs-title">HttpClientConnectionManager</span> <span class="hljs-title">connectionManager</span> = <span class="hljs-title">PoolingHttpClientConnectionManagerBuilder</span>.<span class="hljs-title">create</span><span class="hljs-params">()</span>.<span class="hljs-title">setSSLSocketFactory</span><span class="hljs-params">(sslSocketFactory)</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        <span class="hljs-title">HttpClient</span> <span class="hljs-title">httlClient</span> = <span class="hljs-title">HttpClients</span>.<span class="hljs-title">custom</span><span class="hljs-params">()</span>.<span class="hljs-title">setConnectionManager</span><span class="hljs-params">(connectionManager)</span>.<span class="hljs-title">evictExpiredConnections</span><span class="hljs-params">()</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">ClientHttpRequestFactory</span> <span class="hljs-title">clientHttpRequestFactory</span> = <span class="hljs-title">new</span> <span class="hljs-title">HttpComponentsClientHttpRequestFactory</span><span class="hljs-params">(httlClient)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">return</span> <span class="hljs-title">clientHttpRequestFactory</span>;</span><br><span class="hljs-function">    &#125;</span><br><span class="hljs-function"></span><br><span class="hljs-function">    @<span class="hljs-title">Bean</span></span><br><span class="hljs-function">    <span class="hljs-title">CorsConfigurationSource</span> <span class="hljs-title">corsConfigurationSource</span><span class="hljs-params">()</span> &#123;</span><br><span class="hljs-function">        <span class="hljs-title">CorsConfiguration</span> <span class="hljs-title">config</span> = <span class="hljs-title">new</span> <span class="hljs-title">CorsConfiguration</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">addAllowedHeader</span><span class="hljs-params">(<span class="hljs-string">&quot;*&quot;</span>)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">addAllowedMethod</span><span class="hljs-params">(<span class="hljs-string">&quot;*&quot;</span>)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">addAllowedOriginPattern</span><span class="hljs-params">(<span class="hljs-string">&quot;*&quot;</span>)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">setAllowCredentials</span><span class="hljs-params">(<span class="hljs-literal">true</span>)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">addExposedHeader</span><span class="hljs-params">(<span class="hljs-string">&quot;*&quot;</span>)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">setMaxAge</span><span class="hljs-params">(<span class="hljs-number">1800</span>L)</span>;</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">UrlBasedCorsConfigurationSource</span> <span class="hljs-title">source</span> = <span class="hljs-title">new</span> <span class="hljs-title">UrlBasedCorsConfigurationSource</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        <span class="hljs-title">source</span>.<span class="hljs-title">registerCorsConfiguration</span><span class="hljs-params">(<span class="hljs-string">&quot;/**&quot;</span>, config)</span>;</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">return</span> <span class="hljs-title">source</span>;</span><br><span class="hljs-function">    &#125;</span><br><span class="hljs-function">&#125;</span><br><span class="hljs-function"></span><br></code></pre></td></tr></table></figure>
+
+<h2 id="進行驗證"><a href="#進行驗證" class="headerlink" title="進行驗證"></a>進行驗證</h2><p>當我們點擊html的進行驗證時，會跳轉到keycloak驗證畫面，此時cookie已經獲得spring-session所產生的session，並且此時Redis上已能看到session寫入。</p>
+<p><img src="/./image/Spring-Session_With_Redis_%E9%81%94%E5%88%B0Session_%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/7fbb7c17-dab1-4b36-87a0-19b05d9327f5.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/Spring-Session_With_Redis_%E9%81%94%E5%88%B0Session_%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/aa9ba66d-7258-4310-943f-c71bb2f850f1.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/Spring-Session_With_Redis_%E9%81%94%E5%88%B0Session_%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/afd4cab7-69cb-4be4-8b2a-f25f437e6a44.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>我們會發現為什麼Browser和Redis中的session-id匹配不起來? 原因是因為Spring Session在產生session-id時，就已經先將session使用Base64 Encode起來再回傳給browser，所以我們可以透過base64 decode去解碼，就會發現跟redis內儲存的session-id是一致的。</p>
+<p><img src="/./image/Spring-Session_With_Redis_%E9%81%94%E5%88%B0Session_%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/2394e891-d1e6-4076-a1f2-616597f8b5cf.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>補充:</p>
+<p>spring-session是透過<code>DefaultCookieSerializer</code> 這個class來使用base64 endcode及decode</p>
+<p><img src="/./image/Spring-Session_With_Redis_%E9%81%94%E5%88%B0Session_%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/4add5a52-b2a7-4377-ab44-310eb4b82a25.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/Spring-Session_With_Redis_%E9%81%94%E5%88%B0Session_%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/6c6f7fba-d7f4-4d0d-a8a5-81694eab3851.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>此時我們們可以測試就算將Application重啟，只要我們browser不關閉，就能保持登入而不會跳轉到Keyloak驗證。</p>
+<p>因為本次實驗我們設置session timeout 時間為5分鐘而已，當session timeout後我們可以看到redis的key已經被清空了</p>
+<p><img src="/./image/Spring-Session_With_Redis_%E9%81%94%E5%88%B0Session_%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/855386ad-4727-4792-a3b4-52e191438d54.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>此時我們重新訪問頁面就必須重新登入Keycloak進行驗證</p>
+<p><img src="/./image/Spring-Session_With_Redis_%E9%81%94%E5%88%B0Session_%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/eb271d47-cc01-4830-91cc-60d6e01b04e8.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Spring-Session With Redis 達到Session 集中式處理</div>
+      <div>https://nero811.github.io/2024/08/12/Spring-Session With Redis 達到Session 集中式處理/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Jack Yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>發布於</div>
+          <div>2024年8月12日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>許可協議</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/07/Minikube%E9%83%A8%E5%B1%ACAnsible%20AWX/" title="Minikube部屬Ansible AWX">
+                        <span class="hidden-mobile">Minikube部屬Ansible AWX</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目錄</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜尋</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">關鍵字</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允許 JavaScript 運行的環境下瀏覽效果更佳</div>
+  </noscript>
+</body>
+</html>
