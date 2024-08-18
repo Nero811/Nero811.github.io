@@ -1,0 +1,660 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-TW" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icons8-code-48.png">
+  <link rel="icon" href="/img/icons8-code-48.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Jack Yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言在之前我們已經實現過使用Session Based的SSO，本篇我們來實作使用Token Based的SSO 架構圖 說明: Web Client向Keycloak end-point &#123;&#123;server&#125;&#125;&#x2F;realms&#x2F;&#123;&#123;realm&#125;&#125;&#x2F;protocol&#x2F;openid-connect&#x2F;token獲取access">
+<meta property="og:type" content="article">
+<meta property="og:title" content="實現Token Based的Single Sign On(SSO)">
+<meta property="og:url" content="https://nero811.github.io/2024/08/18/%E5%AF%A6%E7%8F%BEToken%20Based%E7%9A%84Single%20Sign%20On(SSO)/index.html">
+<meta property="og:site_name" content="Jack的後端工程師BLOG">
+<meta property="og:description" content="前言在之前我們已經實現過使用Session Based的SSO，本篇我們來實作使用Token Based的SSO 架構圖 說明: Web Client向Keycloak end-point &#123;&#123;server&#125;&#125;&#x2F;realms&#x2F;&#123;&#123;realm&#125;&#125;&#x2F;protocol&#x2F;openid-connect&#x2F;token獲取access">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://nero811.github.io/img/default.webp">
+<meta property="article:published_time" content="2024-08-18T13:58:57.085Z">
+<meta property="article:modified_time" content="2024-08-18T13:59:03.529Z">
+<meta property="article:author" content="Jack Yang">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://nero811.github.io/img/default.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>實現Token Based的Single Sign On(SSO) - Jack的後端工程師BLOG</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"nero811.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":["home"]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Coding Is Life</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首頁</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>歸檔</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分類</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>標籤</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>關於</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.webp') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">實現Token Based的Single Sign On(SSO)</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-18 21:58" pubdate>
+          2024年8月18日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 分鐘
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">實現Token Based的Single Sign On(SSO)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在之前我們已經實現過使用Session Based的SSO，本篇我們來實作使用Token Based的SSO</p>
+<h1 id="架構圖"><a href="#架構圖" class="headerlink" title="架構圖"></a>架構圖</h1><p><img src="/./image/%E5%AF%A6%E7%8F%BEToken_Based%E7%9A%84Single_Sign_On(SSO)/f719d8b8-2089-492b-84c6-058879469740.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>說明:</p>
+<p>Web Client向Keycloak end-point<code> &#123;&#123;server&#125;&#125;/realms/&#123;&#123;realm&#125;&#125;/protocol/openid-connect/token</code>獲取access-token，並將access-token放入request header去訪問Spring Boot Application。Spring Boot Application會去向Keycloak驗證access-token的合法性，成功認證後就能讓Client端存取服務。</p>
+<h1 id="實作"><a href="#實作" class="headerlink" title="實作"></a>實作</h1><h1 id="Keycloak"><a href="#Keycloak" class="headerlink" title="Keycloak"></a>Keycloak</h1><p><img src="/./image/%E5%AF%A6%E7%8F%BEToken_Based%E7%9A%84Single_Sign_On(SSO)/a608522c-2820-4d23-a68e-d11fdb3d7b7b.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h1 id="WEB"><a href="#WEB" class="headerlink" title="WEB"></a>WEB</h1><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;zh-Hant-TW&quot;</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;authLink&quot;</span>&gt;</span>登入驗證<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;responseDisplay&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span> <span class="hljs-comment">&lt;!-- 用來顯示回應的區塊 --&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript"></span><br><span class="language-javascript">    <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;authLink&quot;</span>).<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;click&quot;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">event</span>) &#123;</span><br><span class="language-javascript">        event.<span class="hljs-title function_">preventDefault</span>();  <span class="hljs-comment">// 防止預設行為</span></span><br><span class="language-javascript"></span><br><span class="language-javascript">        <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;http://localhost:8080/realms/demo/protocol/openid-connect/token&quot;</span>, &#123;</span><br><span class="language-javascript">            <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,</span><br><span class="language-javascript">              <span class="hljs-attr">headers</span>: &#123;</span><br><span class="language-javascript">                <span class="hljs-string">&quot;Content-Type&quot;</span>: <span class="hljs-string">&quot;application/x-www-form-urlencoded&quot;</span></span><br><span class="language-javascript">            &#125;,</span><br><span class="language-javascript">            <span class="hljs-attr">body</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>(&#123;</span><br><span class="language-javascript">           <span class="hljs-string">&quot;Content-Type&quot;</span>: <span class="hljs-string">&quot;application/x-www-form-urlencoded&quot;</span>,</span><br><span class="language-javascript">                <span class="hljs-string">&quot;client_id&quot;</span>: <span class="hljs-string">&quot;token_base&quot;</span>,</span><br><span class="language-javascript">                <span class="hljs-string">&quot;client_secret&quot;</span>: <span class="hljs-string">&quot;A8GNy8ZfajJEIFqlfuC1coNVt7jdnkLj&quot;</span>,</span><br><span class="language-javascript">                <span class="hljs-string">&quot;grant_type&quot;</span>: <span class="hljs-string">&quot;password&quot;</span>,</span><br><span class="language-javascript">                <span class="hljs-string">&quot;username&quot;</span>: <span class="hljs-string">&quot;user1&quot;</span>,</span><br><span class="language-javascript">                <span class="hljs-string">&quot;password&quot;</span>: <span class="hljs-string">&quot;user1&quot;</span>,</span><br><span class="language-javascript">                <span class="hljs-string">&quot;scope&quot;</span>: <span class="hljs-string">&quot;openid&quot;</span></span><br><span class="language-javascript">            &#125;)</span><br><span class="language-javascript">        &#125;)</span><br><span class="language-javascript">     .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.<span class="hljs-title function_">json</span>())  <span class="hljs-comment">// 解析回應為 JSON</span></span><br><span class="language-javascript">        .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> &#123;</span><br><span class="language-javascript">            <span class="hljs-keyword">if</span> (data.<span class="hljs-property">access_token</span>) &#123;</span><br><span class="language-javascript">                <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;獲取 access_token 成功&quot;</span>);</span><br><span class="language-javascript"></span><br><span class="language-javascript">                <span class="hljs-comment">// 使用 access_token 作為 Bearer Token 發送 GET 請求</span></span><br><span class="language-javascript">                <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;http://localhost:8081/checkLogin&quot;</span>, &#123;</span><br><span class="language-javascript">                    <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;GET&quot;</span>,</span><br><span class="language-javascript">                    <span class="hljs-attr">headers</span>: &#123;</span><br><span class="language-javascript">                        <span class="hljs-string">&quot;Authorization&quot;</span>: <span class="hljs-string">&quot;Bearer &quot;</span> + data.<span class="hljs-property">access_token</span></span><br><span class="language-javascript">                    &#125;</span><br><span class="language-javascript">                &#125;)</span><br><span class="language-javascript">                .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.<span class="hljs-title function_">text</span>())  <span class="hljs-comment">// 解析第二個回應為純文字</span></span><br><span class="language-javascript">                .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> &#123;</span><br><span class="language-javascript">                    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;驗證請求成功&quot;</span>);</span><br><span class="language-javascript">                    <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;responseDisplay&quot;</span>).<span class="hljs-property">innerText</span> = data; <span class="hljs-comment">// 顯示驗證回應</span></span><br><span class="language-javascript">                &#125;)</span><br><span class="language-javascript">                .<span class="hljs-title function_">catch</span>(<span class="hljs-function"><span class="hljs-params">error</span> =&gt;</span> &#123;</span><br><span class="language-javascript">                    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;錯誤:&quot;</span>, error);</span><br><span class="language-javascript">                    <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;responseDisplay&quot;</span>).<span class="hljs-property">innerText</span> = <span class="hljs-string">&quot;錯誤: &quot;</span> + error;</span><br><span class="language-javascript">                &#125;);</span><br><span class="language-javascript">            &#125; <span class="hljs-keyword">else</span> &#123;</span><br><span class="language-javascript">                <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;獲取 access_token 失敗&quot;</span>);</span><br><span class="language-javascript">                <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;responseDisplay&quot;</span>).<span class="hljs-property">innerText</span> = <span class="hljs-string">&quot;獲取 access_token 失敗&quot;</span>;</span><br><span class="language-javascript">            &#125;</span><br><span class="language-javascript">        &#125;)</span><br><span class="language-javascript">        .<span class="hljs-title function_">catch</span>(<span class="hljs-function"><span class="hljs-params">error</span> =&gt;</span> &#123;</span><br><span class="language-javascript">            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;錯誤:&quot;</span>, error);</span><br><span class="language-javascript">            <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;responseDisplay&quot;</span>).<span class="hljs-property">innerText</span> = <span class="hljs-string">&quot;錯誤: &quot;</span> + error;</span><br><span class="language-javascript">        &#125;);</span><br><span class="language-javascript">    &#125;);</span><br><span class="language-javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h1 id="Spring-Security"><a href="#Spring-Security" class="headerlink" title="Spring Security"></a>Spring Security</h1><h2 id="config"><a href="#config" class="headerlink" title="config"></a>config</h2><h3 id="JwtConverter"><a href="#JwtConverter" class="headerlink" title="JwtConverter"></a>JwtConverter</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.example.demo_oauth.config;<br><br><span class="hljs-keyword">import</span> org.springframework.context.annotation.Bean;<br><span class="hljs-keyword">import</span> org.springframework.context.annotation.Configuration;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;<br><br><span class="hljs-meta">@Configuration</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">JwtConverter</span> &#123;<br>	<span class="hljs-meta">@Bean</span><br>	<span class="hljs-keyword">public</span> JwtAuthenticationConverter <span class="hljs-title function_">jwtAuthenticationConverter</span><span class="hljs-params">()</span> &#123;<br>	    <span class="hljs-type">JwtGrantedAuthoritiesConverter</span> <span class="hljs-variable">grantedAuthoritiesConverter</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JwtGrantedAuthoritiesConverter</span>();<br>		<span class="hljs-comment">// 變更權限前綴為 ROLE_ ， Keycloak 預設權限前綴為 SCOPE_ 這在使用hasRole() 會出現問題</span><br>		grantedAuthoritiesConverter.setAuthorityPrefix(<span class="hljs-string">&quot;ROLE_&quot;</span>);<br><br>	    <span class="hljs-type">JwtAuthenticationConverter</span> <span class="hljs-variable">jwtAuthenticationConverter</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JwtAuthenticationConverter</span>();<br>	    jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);<br>	    <span class="hljs-keyword">return</span> jwtAuthenticationConverter;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="SecurityConfig"><a href="#SecurityConfig" class="headerlink" title="SecurityConfig"></a>SecurityConfig</h3><figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><code class="hljs livescript">package com.example.demo_oauth.config;<br><br><br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.classic.HttpClient;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.impl.classic.HttpClients;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.io.HttpClientConnectionManager;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;<br><span class="hljs-keyword">import</span> org.apache.hc.client5.http.ssl.TrustAllStrategy;<br><span class="hljs-keyword">import</span> org.apache.hc.core5.ssl.SSLContexts;<br><br><span class="hljs-keyword">import</span> java.security.KeyManagementException;<br><span class="hljs-keyword">import</span> java.security.KeyStoreException;<br><span class="hljs-keyword">import</span> java.security.NoSuchAlgorithmException;<br><br><span class="hljs-keyword">import</span> javax.net.ssl.SSLContext;<br><br><span class="hljs-keyword">import</span> org.springframework.beans.factory.annotation.Autowired;<br><span class="hljs-keyword">import</span> org.springframework.beans.factory.annotation.Value;<br><span class="hljs-keyword">import</span> org.springframework.context.annotation.Bean;<br><span class="hljs-keyword">import</span> org.springframework.context.annotation.Configuration;<br><span class="hljs-keyword">import</span> org.springframework.http.client.ClientHttpRequestFactory;<br><span class="hljs-keyword">import</span> org.springframework.http.client.HttpComponentsClientHttpRequestFactory;<br><span class="hljs-keyword">import</span> org.springframework.security.config.Customizer;<br><span class="hljs-keyword">import</span> org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;<br><span class="hljs-keyword">import</span> org.springframework.security.config.annotation.web.builders.HttpSecurity;<br><span class="hljs-keyword">import</span> org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.jwt.JwtDecoder;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.jwt.NimbusJwtDecoder;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;<br><span class="hljs-keyword">import</span> org.springframework.security.web.SecurityFilterChain;<br><span class="hljs-keyword">import</span> org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;<br><span class="hljs-keyword">import</span> org.springframework.web.client.RestTemplate;<br><span class="hljs-keyword">import</span> org.springframework.web.cors.CorsConfiguration;<br><span class="hljs-keyword">import</span> org.springframework.web.cors.CorsConfigurationSource;<br><span class="hljs-keyword">import</span> org.springframework.web.cors.UrlBasedCorsConfigurationSource;<br><br>@Configuration<br>@EnableMethodSecurity<br>@EnableWebSecurity<br>public <span class="hljs-keyword">class</span> <span class="hljs-title class_">SecurityConfig</span> &#123;<br><br>    @Value(<span class="hljs-string">&quot;$&#123;spring.security.oauth2.client.provider.keycloak.issuer-uri&#125;&quot;</span>)<br>    private <span class="hljs-built_in">String</span> issuerUri;<br><br>    @Autowired<br>    private JwtAuthenticationConverter jwtAuthenticationConverter;<br><br>    @Bean<br>    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception &#123;<br>        http.csrf(csrf -&gt; csrf.disable())<br>                .cors(cors -&gt; cors.configurationSource(corsConfigurationSource()));<br><br>        http.authorizeHttpRequests(authorize -&gt; authorize.anyRequest().authenticated())<br>                .oauth2ResourceServer<span class="hljs-function"><span class="hljs-params">((oauth2) -&gt; oauth2.jwt(jwt -&gt; jwt.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter)))</span>; // 使用<span class="hljs-title">jwtDecoder</span>向<span class="hljs-title">Author</span> <span class="hljs-title">Server</span>驗證<span class="hljs-title">Accesstion</span>，並使用自定義的<span class="hljs-title">jwtConverter</span>，<span class="hljs-title">jwt</span> <span class="hljs-title">decode</span>後將權限收集進<span class="hljs-title">Collection</span>&lt;? <span class="hljs-title">extends</span> <span class="hljs-title">GrantedAuthority</span>&gt;中</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">return</span> <span class="hljs-title">http</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">    &#125;</span><br><span class="hljs-function"></span><br><span class="hljs-function">    <span class="hljs-title">private</span> <span class="hljs-title">JwtDecoder</span> <span class="hljs-title">jwtDecoder</span><span class="hljs-params">()</span> &#123;</span><br><span class="hljs-function">        <span class="hljs-title">RestTemplate</span> <span class="hljs-title">restTemplate</span> = <span class="hljs-title">new</span> <span class="hljs-title">RestTemplate</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        <span class="hljs-title">restTemplate</span>.<span class="hljs-title">setRequestFactory</span><span class="hljs-params">(trustAllClientHttpRequestFactory())</span>;</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">return</span> <span class="hljs-title">NimbusJwtDecoder</span>.<span class="hljs-title">withIssuerLocation</span><span class="hljs-params">(issuerUri)</span>.<span class="hljs-title">restOperations</span><span class="hljs-params">(restTemplate)</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">    &#125;</span><br><span class="hljs-function"></span><br><span class="hljs-function">    <span class="hljs-title">private</span> <span class="hljs-title">ClientHttpRequestFactory</span> <span class="hljs-title">trustAllClientHttpRequestFactory</span><span class="hljs-params">()</span> &#123;</span><br><span class="hljs-function">        <span class="hljs-title">SSLContext</span> <span class="hljs-title">sslcontext</span> = <span class="hljs-title">null</span>;</span><br><span class="hljs-function">        <span class="hljs-title">try</span> &#123;</span><br><span class="hljs-function">            <span class="hljs-title">sslcontext</span> = <span class="hljs-title">SSLContexts</span>.<span class="hljs-title">custom</span><span class="hljs-params">()</span>.<span class="hljs-title">loadTrustMaterial</span><span class="hljs-params">(<span class="hljs-literal">null</span>, <span class="hljs-keyword">new</span> TrustAllStrategy())</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        &#125; <span class="hljs-title">catch</span> <span class="hljs-params">(KeyManagementException | NoSuchAlgorithmException | KeyStoreException e)</span> &#123;</span><br><span class="hljs-function">            <span class="hljs-title">e</span>.<span class="hljs-title">printStackTrace</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        &#125;</span><br><span class="hljs-function">        <span class="hljs-title">SSLConnectionSocketFactory</span> <span class="hljs-title">sslSocketFactory</span> = <span class="hljs-title">SSLConnectionSocketFactoryBuilder</span>.<span class="hljs-title">create</span><span class="hljs-params">()</span>.<span class="hljs-title">setSslContext</span><span class="hljs-params">(sslcontext)</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        <span class="hljs-title">HttpClientConnectionManager</span> <span class="hljs-title">connectionManager</span> = <span class="hljs-title">PoolingHttpClientConnectionManagerBuilder</span>.<span class="hljs-title">create</span><span class="hljs-params">()</span>.<span class="hljs-title">setSSLSocketFactory</span><span class="hljs-params">(sslSocketFactory)</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        <span class="hljs-title">HttpClient</span> <span class="hljs-title">httlClient</span> = <span class="hljs-title">HttpClients</span>.<span class="hljs-title">custom</span><span class="hljs-params">()</span>.<span class="hljs-title">setConnectionManager</span><span class="hljs-params">(connectionManager)</span>.<span class="hljs-title">evictExpiredConnections</span><span class="hljs-params">()</span>.<span class="hljs-title">build</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">ClientHttpRequestFactory</span> <span class="hljs-title">clientHttpRequestFactory</span> = <span class="hljs-title">new</span> <span class="hljs-title">HttpComponentsClientHttpRequestFactory</span><span class="hljs-params">(httlClient)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">return</span> <span class="hljs-title">clientHttpRequestFactory</span>;</span><br><span class="hljs-function">    &#125;</span><br><span class="hljs-function"></span><br><span class="hljs-function">    @<span class="hljs-title">Bean</span></span><br><span class="hljs-function">    <span class="hljs-title">CorsConfigurationSource</span> <span class="hljs-title">corsConfigurationSource</span><span class="hljs-params">()</span> &#123;</span><br><span class="hljs-function">        <span class="hljs-title">CorsConfiguration</span> <span class="hljs-title">config</span> = <span class="hljs-title">new</span> <span class="hljs-title">CorsConfiguration</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">addAllowedHeader</span><span class="hljs-params">(<span class="hljs-string">&quot;*&quot;</span>)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">addAllowedMethod</span><span class="hljs-params">(<span class="hljs-string">&quot;*&quot;</span>)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">addAllowedOriginPattern</span><span class="hljs-params">(<span class="hljs-string">&quot;*&quot;</span>)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">setAllowCredentials</span><span class="hljs-params">(<span class="hljs-literal">true</span>)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">addExposedHeader</span><span class="hljs-params">(<span class="hljs-string">&quot;*&quot;</span>)</span>;</span><br><span class="hljs-function">        <span class="hljs-title">config</span>.<span class="hljs-title">setMaxAge</span><span class="hljs-params">(<span class="hljs-number">1800</span>L)</span>;</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">UrlBasedCorsConfigurationSource</span> <span class="hljs-title">source</span> = <span class="hljs-title">new</span> <span class="hljs-title">UrlBasedCorsConfigurationSource</span><span class="hljs-params">()</span>;</span><br><span class="hljs-function">        <span class="hljs-title">source</span>.<span class="hljs-title">registerCorsConfiguration</span><span class="hljs-params">(<span class="hljs-string">&quot;/**&quot;</span>, config)</span>;</span><br><span class="hljs-function"></span><br><span class="hljs-function">        <span class="hljs-title">return</span> <span class="hljs-title">source</span>;</span><br><span class="hljs-function">    &#125;</span><br><span class="hljs-function">&#125;</span><br><span class="hljs-function"></span><br></code></pre></td></tr></table></figure>
+
+<h2 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a>Controller</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-keyword">package</span> com.example.demo_oauth.controller;<br><br><span class="hljs-keyword">import</span> java.util.Collection;<br><span class="hljs-keyword">import</span> java.util.Map;<br><br><br><span class="hljs-keyword">import</span> org.springframework.beans.factory.<span class="hljs-keyword">annotation</span>.Value;<br><span class="hljs-keyword">import</span> org.springframework.http.ResponseEntity;<br><span class="hljs-keyword">import</span> org.springframework.security.access.prepost.PreAuthorize;<br><span class="hljs-keyword">import</span> org.springframework.security.core.Authentication;<br><span class="hljs-keyword">import</span> org.springframework.security.core.GrantedAuthority;<br><span class="hljs-keyword">import</span> org.springframework.security.core.context.SecurityContextHolder;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.core.user.OAuth2User;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.jwt.Jwt;<br><span class="hljs-keyword">import</span> org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;<br><span class="hljs-keyword">import</span> org.springframework.web.bind.<span class="hljs-keyword">annotation</span>.GetMapping;<br><span class="hljs-keyword">import</span> org.springframework.web.bind.<span class="hljs-keyword">annotation</span>.PostMapping;<br><span class="hljs-keyword">import</span> org.springframework.web.bind.<span class="hljs-keyword">annotation</span>.RestController;<br><span class="hljs-keyword">import</span> org.springframework.web.servlet.view.RedirectView;<br><br><br><span class="hljs-meta">@RestController</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">loginController</span> &#123;<br><br>	<span class="hljs-meta">@Value(<span class="hljs-string">&quot;<span class="hljs-subst">$&#123;spring.security.oauth2.client.registration.keycloak.redirect-uri&#125;</span>&quot;</span>)</span><br>	<span class="hljs-keyword">private</span> String authUri;<br><br>	<span class="hljs-meta">@GetMapping(<span class="hljs-string">&quot;/checkLogin&quot;</span>)</span><br>	<span class="hljs-keyword">public</span> ResponseEntity&lt;String&gt; checkLogin() &#123;<br>		OAuth2User oAuth2User;<br>		DefaultOidcUser defaultOidcUser;<br>		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();<br>		<span class="hljs-keyword">if</span> (authentication instanceof OAuth2AuthenticationToken) &#123;<br>			defaultOidcUser = (DefaultOidcUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();<br>			<span class="hljs-keyword">if</span> (defaultOidcUser != <span class="hljs-literal">null</span>) &#123;<br>				System.<span class="hljs-keyword">out</span>.println(<span class="hljs-string">&quot;Login Success !!&quot;</span>);<br>				System.<span class="hljs-keyword">out</span>.println(<span class="hljs-string">&quot;User Id is: &quot;</span> + defaultOidcUser.getUserInfo().getClaim(<span class="hljs-string">&quot;preferred_username&quot;</span>));<br>				defaultOidcUser.getAuthorities().forEach(role -&gt; &#123;System.<span class="hljs-keyword">out</span>.println(<span class="hljs-string">&quot; role : &quot;</span> + role);&#125;);<br>				Map&lt;String, Object&gt; realm = defaultOidcUser.getClaimAsMap(<span class="hljs-string">&quot;resource_access&quot;</span>);<br><br>				<span class="hljs-keyword">return</span> ResponseEntity.ok(<span class="hljs-string">&quot;Login Success by using OIDC flow !! User Id is : &quot;</span> + defaultOidcUser.getUserInfo().getClaim(<span class="hljs-string">&quot;preferred_username&quot;</span>));<br>			&#125;<br>		&#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (authentication instanceof JwtAuthenticationToken) &#123;<br>			Jwt jwt = (Jwt) authentication.getPrincipal();<br>			Collection&lt;? extends GrantedAuthority&gt; authorties = SecurityContextHolder.getContext().getAuthentication().getAuthorities();<br>			<span class="hljs-keyword">if</span> (jwt != <span class="hljs-literal">null</span> &amp;&amp; authorties != <span class="hljs-literal">null</span>) &#123;<br>				String userName = jwt.getClaim(<span class="hljs-string">&quot;preferred_username&quot;</span>);<br>				System.<span class="hljs-keyword">out</span>.println(<span class="hljs-string">&quot;Login Success !!&quot;</span>);<br>				System.<span class="hljs-keyword">out</span>.println(<span class="hljs-string">&quot;User name is : &quot;</span> + userName);<br>				System.<span class="hljs-keyword">out</span>.println(<span class="hljs-string">&quot;User&#x27;s authorities is : &quot;</span>+ authorties);<br><br>				<span class="hljs-keyword">return</span> ResponseEntity.ok(<span class="hljs-string">&quot;Login Success by using access token !! User name is : &quot;</span> + userName);<br>			&#125;<br>		&#125;<br><br>		<span class="hljs-keyword">return</span> ResponseEntity.ok(<span class="hljs-string">&quot;Login failed .&quot;</span>);<br>	&#125;<br>	<br>	<span class="hljs-meta">@GetMapping(<span class="hljs-string">&quot;/loginSuccess&quot;</span>)</span><br>	<span class="hljs-keyword">public</span> Collection&lt;?&gt; loginSuccess(Authentication authentication) &#123;<br>		Collection&lt;? extends GrantedAuthority&gt; authorties = authentication.getAuthorities();<br>		<span class="hljs-keyword">return</span> authorties;<br>	&#125;<br>	<br>	<span class="hljs-meta">@GetMapping(<span class="hljs-string">&quot;/hasAuthority&quot;</span>)</span><br>	<span class="hljs-meta">@PreAuthorize(<span class="hljs-string">&quot;hasAuthority(&#x27;ROLE_profile&#x27;)&quot;</span>)</span><br>	<span class="hljs-keyword">public</span> ResponseEntity&lt;String&gt; admin() &#123;<br>		System.<span class="hljs-keyword">out</span>.println(<span class="hljs-string">&quot;Client has authority: ROLE_profile&quot;</span>);<br>	    <span class="hljs-keyword">return</span> ResponseEntity.ok(<span class="hljs-string">&quot;Client has authority: ROLE_profile&quot;</span>);<br>	&#125;<br><br>	<span class="hljs-meta">@GetMapping(<span class="hljs-string">&quot;/userLogin&quot;</span>)</span><br>	<span class="hljs-keyword">public</span> RedirectView login() &#123;<br>		System.<span class="hljs-keyword">out</span>.println(<span class="hljs-string">&quot;user login&quot;</span>);<br>		RedirectView redirectView = new RedirectView();<br>		redirectView.setUrl(authUri);<br>		<span class="hljs-keyword">return</span> redirectView;<br>	&#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="application-properties"><a href="#application-properties" class="headerlink" title="application properties"></a>application properties</h2><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">server.port</span>=<span class="hljs-number">8081</span><br><br><span class="hljs-comment"># OAuth2 Client settings</span><br><span class="hljs-attr">base.url</span>=http://localhost:<span class="hljs-number">8080</span><br><span class="hljs-attr">successful.redirect.url</span>=http://localhost:<span class="hljs-number">8081</span>/loginSuccess<br><span class="hljs-attr">spring.security.oauth2.client.registration.keycloak.client-id</span>=token_base<br><span class="hljs-attr">spring.security.oauth2.client.registration.keycloak.client-secret</span>=A8GNy8ZfajJEIFqlfuC1coNVt7jdnkLj<br><span class="hljs-attr">spring.security.oauth2.client.registration.keycloak.authorization-grant-type</span>=authorization_code<br><br><span class="hljs-comment"># Spring Security oauth2 Endpoint</span><br><span class="hljs-attr">spring.security.oauth2.client.registration.keycloak.redirect-uri</span>=http://localhost:<span class="hljs-number">8081</span>/login/oauth2/code/keycloak<br><span class="hljs-attr">spring.security.oauth2.client.registration.keycloak.scope</span>=email,profile,openid<br><br><span class="hljs-comment">## OAuth2 Provider settings for Keycloak</span><br><span class="hljs-attr">spring.security.oauth2.client.provider.keycloak.authorization-uri</span>=<span class="hljs-variable">$&#123;base.url&#125;</span>/realms/demo/protocol/openid-connect/auth<br><span class="hljs-attr">spring.security.oauth2.client.provider.keycloak.token-uri</span>=<span class="hljs-variable">$&#123;base.url&#125;</span>/realms/demo/protocol/openid-connect/token<br><span class="hljs-attr">spring.security.oauth2.client.provider.keycloak.user-info-uri</span>=<span class="hljs-variable">$&#123;base.url&#125;</span>/realms/demo/protocol/openid-connect/userinfo<br><span class="hljs-attr">spring.security.oauth2.client.provider.keycloak.user-name-attribute</span>=preferred_username<br><span class="hljs-attr">spring.security.oauth2.client.provider.keycloak.issuer-uri</span>=<span class="hljs-variable">$&#123;base.url&#125;</span>/realms/demo<br><span class="hljs-attr">spring.security.oauth2.client.provider.keycloak.jwk-set-uri</span>=<span class="hljs-variable">$&#123;base.url&#125;</span>/realms/demo/protocol/openid-connect/certs<br><span class="hljs-attr">spring.security.oauth2.resourceserver.jwt.jwk-set-uri</span>=<span class="hljs-variable">$&#123;base.url&#125;</span>/realms/demo/protocol/openid-connect/certs<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="pom-xml"><a href="#pom-xml" class="headerlink" title="pom.xml"></a>pom.xml</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span> encoding=<span class="hljs-string">&quot;UTF-8&quot;</span>?&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">project</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://maven.apache.org/POM/4.0.0&quot;</span></span><br><span class="hljs-tag">	<span class="hljs-attr">xmlns:xsi</span>=<span class="hljs-string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span><br><span class="hljs-tag">	<span class="hljs-attr">xsi:schemaLocation</span>=<span class="hljs-string">&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">modelVersion</span>&gt;</span>4.0.0<span class="hljs-tag">&lt;/<span class="hljs-name">modelVersion</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">parent</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.2.3<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">relativePath</span> /&gt;</span> <span class="hljs-comment">&lt;!-- lookup parent from repository --&gt;</span><br>	<span class="hljs-tag">&lt;/<span class="hljs-name">parent</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.example<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>demo_oauth<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>0.0.1-SNAPSHOT<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>demo_oauth<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">description</span>&gt;</span>Demo project for Spring Boot<span class="hljs-tag">&lt;/<span class="hljs-name">description</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">properties</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">java.version</span>&gt;</span>17<span class="hljs-tag">&lt;/<span class="hljs-name">java.version</span>&gt;</span><br>	<span class="hljs-tag">&lt;/<span class="hljs-name">properties</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-oauth2-client<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>		<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-security<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>		<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>		<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><br>		<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.projectlombok<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>lombok<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">optional</span>&gt;</span>true<span class="hljs-tag">&lt;/<span class="hljs-name">optional</span>&gt;</span><br>		<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-test<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span><br>		<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.security<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-security-test<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span><br>		<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-oauth2-resource-server<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>		<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.httpcomponents.client5<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>httpclient5-fluent<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>		<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span><br><br>	<span class="hljs-tag">&lt;<span class="hljs-name">build</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">plugins</span>&gt;</span><br>			<span class="hljs-tag">&lt;<span class="hljs-name">plugin</span>&gt;</span><br>				<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>				<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>				<span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span><br>					<span class="hljs-tag">&lt;<span class="hljs-name">excludes</span>&gt;</span><br>						<span class="hljs-tag">&lt;<span class="hljs-name">exclude</span>&gt;</span><br>							<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.projectlombok<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>							<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>lombok<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>						<span class="hljs-tag">&lt;/<span class="hljs-name">exclude</span>&gt;</span><br>					<span class="hljs-tag">&lt;/<span class="hljs-name">excludes</span>&gt;</span><br>				<span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span><br>			<span class="hljs-tag">&lt;/<span class="hljs-name">plugin</span>&gt;</span><br>		<span class="hljs-tag">&lt;/<span class="hljs-name">plugins</span>&gt;</span><br>	<span class="hljs-tag">&lt;/<span class="hljs-name">build</span>&gt;</span><br><br><span class="hljs-tag">&lt;/<span class="hljs-name">project</span>&gt;</span><br><br></code></pre></td></tr></table></figure>
+
+<h1 id="驗證"><a href="#驗證" class="headerlink" title="驗證"></a>驗證</h1><p>我們在client開發者模式中可以看到，client向keycloak拿到了access-token。</p>
+<p>client再將access-token放入header中的Authorization且Auth type為Bearer Token，訪問Spring Boot Application。</p>
+<p>Spring Boot Application向keycloak認證了access-token後，讓client存取api服務。</p>
+<h2 id="WEB-1"><a href="#WEB-1" class="headerlink" title="WEB"></a>WEB</h2><p><img src="/./image/%E5%AF%A6%E7%8F%BEToken_Based%E7%9A%84Single_Sign_On(SSO)/8909fd3d-c553-4776-af9d-25a5d5cb783e.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="Spring-Boot-console"><a href="#Spring-Boot-console" class="headerlink" title="Spring Boot console"></a>Spring Boot console</h2><p><img src="/./image/%E5%AF%A6%E7%8F%BEToken_Based%E7%9A%84Single_Sign_On(SSO)/c906f140-7ad3-4fd5-9c0d-f5440633255d.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="Keycloak-1"><a href="#Keycloak-1" class="headerlink" title="Keycloak"></a>Keycloak</h2><p><img src="/./image/%E5%AF%A6%E7%8F%BEToken_Based%E7%9A%84Single_Sign_On(SSO)/a38cf6e6-6a62-4fa5-b738-96473ad43728.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h1 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h1><p>本篇我們實作了Token Based的SSO，Access-token就像一張一票玩到底的通行證一樣，讓使用者可以只輸入一次帳號密碼，就可以存取所有的服務，很適合用在企業的內部系統當中。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>實現Token Based的Single Sign On(SSO)</div>
+      <div>https://nero811.github.io/2024/08/18/實現Token Based的Single Sign On(SSO)/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Jack Yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>發布於</div>
+          <div>2024年8月18日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>許可協議</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/12/Spring-Session%20With%20Redis%20%E9%81%94%E5%88%B0Session%20%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/" title="Spring-Session With Redis 達到Session 集中式處理">
+                        <span class="hidden-mobile">Spring-Session With Redis 達到Session 集中式處理</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目錄</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜尋</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">關鍵字</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允許 JavaScript 運行的環境下瀏覽效果更佳</div>
+  </noscript>
+</body>
+</html>
