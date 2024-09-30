@@ -1,0 +1,899 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-TW" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icons8-code-48.png">
+  <link rel="icon" href="/img/icons8-code-48.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Jack Yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言AWX的PlayBook功能非常強大，可以與多種服務、平台和基礎設施進行互動。 例如:  雲提供商：AWX 可以與 AWS、Azure、Google Cloud 等雲服務平台進行互動，支持虛擬機實例的創建、網絡設置、負載均衡器配置等操作。  容器編排工具：AWX 與 Kubernetes、OpenShift 等平台集成良好，能自動化容器應用的部署、升級和管理。  版本控制系統：AWX 可以與">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用AWX 於K8S中部署服務">
+<meta property="og:url" content="https://nero811.github.io/2024/09/30/%E4%BD%BF%E7%94%A8AWX%20%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/index.html">
+<meta property="og:site_name" content="Jack的後端工程師BLOG">
+<meta property="og:description" content="前言AWX的PlayBook功能非常強大，可以與多種服務、平台和基礎設施進行互動。 例如:  雲提供商：AWX 可以與 AWS、Azure、Google Cloud 等雲服務平台進行互動，支持虛擬機實例的創建、網絡設置、負載均衡器配置等操作。  容器編排工具：AWX 與 Kubernetes、OpenShift 等平台集成良好，能自動化容器應用的部署、升級和管理。  版本控制系統：AWX 可以與">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-814d-9e5c-fb751f498351.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-81e8-ae53-ecade8ef2a98.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-8155-b9a3-e8eb27d53317.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-81cf-a1d8-dd889200a1bd.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-811a-9e68-c9dab9d624f8.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-8188-bcbe-ccb73449bd59.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-81ec-b8fd-d294d01bc8fa.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-817d-9199-d2874855d332.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-8192-a8c6-fb2749d97246.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-814c-8ae3-c733619e4388.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-8194-8dc9-e861b65055d3.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-815b-88e4-c2c0b8ee134a.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-8158-82dc-d39054c632cb.webp">
+<meta property="article:published_time" content="2024-09-30T15:07:10.318Z">
+<meta property="article:modified_time" content="2024-09-30T15:08:25.187Z">
+<meta property="article:author" content="Jack Yang">
+<meta property="article:tag" content="AWX">
+<meta property="article:tag" content="K8S">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://nero811.github.io/image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-814d-9e5c-fb751f498351.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>使用AWX 於K8S中部署服務 - Jack的後端工程師BLOG</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"nero811.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":["home"]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Coding Is Life</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首頁</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>歸檔</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分類</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>標籤</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>關於</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/undraw_Programming_re_kg9v.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">使用AWX 於K8S中部署服務</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-09-30 23:07" pubdate>
+          2024年9月30日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分鐘
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">使用AWX 於K8S中部署服務</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>AWX的PlayBook功能非常強大，可以與多種服務、平台和基礎設施進行互動。</p>
+<p>例如:</p>
+<ul>
+<li><p>雲提供商：AWX 可以與 AWS、Azure、Google Cloud 等雲服務平台進行互動，支持虛擬機實例的創建、網絡設置、負載均衡器配置等操作。</p>
+</li>
+<li><p>容器編排工具：AWX 與 Kubernetes、OpenShift 等平台集成良好，能自動化容器應用的部署、升級和管理。</p>
+</li>
+<li><p>版本控制系統：AWX 可以與 Git、GitHub、GitLab 等源代碼管理工具交互，通過提取 Playbook 來自動化 CI&#x2F;CD 流程。</p>
+</li>
+<li><p>網絡設備：它可以與 Cisco、Juniper 等網絡設備進行自動化配置和管理，通過 SSH、API 等方式與設備進行交互。</p>
+</li>
+</ul>
+<p>本篇目標是透過PlayBook於K8S中啟動一個Redis Pod。</p>
+<h1 id="STEP-1-建立Credentials"><a href="#STEP-1-建立Credentials" class="headerlink" title="STEP 1. 建立Credentials"></a>STEP 1. 建立Credentials</h1><p>用途:</p>
+<p>當 AWX 啟動Template時，它會使用指定的執行環境（Execution Environment），這是預先配置好的 Docker 容器，這個容器可能缺乏必要的 Kubernetes 憑證。而AWX就是將憑證、API TOKEN、SSH Key儲存在Credentials。因此這邊建立一個Credentials，裡面帶著K8S API Token並掛載給Template。</p>
+<ol>
+<li>於awx-demo-task pod:&#x2F;var&#x2F;run&#x2F;secrets&#x2F;kubernetes.io&#x2F;serviceaccount&#x2F;token中取得K8S API Token</li>
+</ol>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-814d-9e5c-fb751f498351.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<ol>
+<li>使用minikube ip取得Kubernetes API Endpoint</li>
+</ol>
+<p>這邊獲得的IP是192.168.49.2，根據 Minikube 的默認設置，Kubernetes API 服務器的端口通常是 <code>8443</code>。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">minikube</span> ip<br><br><br><span class="hljs-attribute">C</span>:\Users\jy811&gt;minikube ip<br><span class="hljs-attribute">W0903</span> <span class="hljs-number">23</span>:<span class="hljs-number">24</span>:<span class="hljs-number">45</span>.<span class="hljs-number">920744</span>   <span class="hljs-number">15836</span> main.go:<span class="hljs-number">291</span>] Unable to resolve the current Docker CLI context <span class="hljs-string">&quot;default&quot;</span>: context <span class="hljs-string">&quot;default&quot;</span>: context not found: open C:\Users\jy811\.docker\contexts\meta\<span class="hljs-number">37</span>a8eec1ce19687d132fe29051dca629d164e2c4958ba141d5f4133a33f0688f\meta.json: The system cannot find the path specified.<br><span class="hljs-attribute">192</span>.<span class="hljs-number">168</span>.<span class="hljs-number">49</span>.<span class="hljs-number">2</span><br></code></pre></td></tr></table></figure>
+
+<ol>
+<li>於WEB介面中新增一個新的Credentials</li>
+</ol>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-81e8-ae53-ecade8ef2a98.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>Credential Type選擇 “OpenShift or Kubernetes API Bearer Token”</p>
+<p>OpenShift or Kubernetes API Endpoint 填入2. 取得的 <a target="_blank" rel="noopener" href="https://192.168.49.2:8443/">https://192.168.49.2:8443</a></p>
+<p>API authentication bearer token 填入我們在 1. 取得的K8S API Token</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-8155-b9a3-e8eb27d53317.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-81cf-a1d8-dd889200a1bd.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h1 id="STEP2-建立Projects"><a href="#STEP2-建立Projects" class="headerlink" title="STEP2. 建立Projects"></a>STEP2. 建立Projects</h1><h2 id="準備一個Play-Book"><a href="#準備一個Play-Book" class="headerlink" title="準備一個Play Book"></a>準備一個Play Book</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-meta">---</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">Redis</span> <span class="hljs-string">Pod</span><br>  <span class="hljs-attr">hosts:</span> <span class="hljs-string">localhost</span><br>  <span class="hljs-attr">tasks:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Create</span> <span class="hljs-string">Redis</span> <span class="hljs-string">Pod</span><br>      <span class="hljs-attr">kubernetes.core.k8s:</span><br>        <span class="hljs-attr">state:</span> <span class="hljs-string">present</span><br>        <span class="hljs-attr">definition:</span><br>          <span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br>          <span class="hljs-attr">kind:</span> <span class="hljs-string">Pod</span><br>          <span class="hljs-attr">metadata:</span><br>            <span class="hljs-attr">name:</span> <span class="hljs-string">redis</span><br>            <span class="hljs-attr">namespace:</span> <span class="hljs-string">default</span><br>            <span class="hljs-attr">labels:</span><br>              <span class="hljs-attr">app:</span> <span class="hljs-string">redis</span><br>          <span class="hljs-attr">spec:</span><br>            <span class="hljs-attr">containers:</span><br>            <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">redis</span><br>              <span class="hljs-attr">image:</span> <span class="hljs-string">docker.io/redis:latest</span><br>              <span class="hljs-attr">ports:</span><br>              <span class="hljs-bullet">-</span> <span class="hljs-attr">containerPort:</span> <span class="hljs-number">6379</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="於AWX頁面中建立Project"><a href="#於AWX頁面中建立Project" class="headerlink" title="於AWX頁面中建立Project"></a>於AWX頁面中建立Project</h2><p>這邊可以在AWX的task中建立PlayBook，預設路徑是&#x2F;var&#x2F;lib&#x2F;awx&#x2F;projects，又或是從GitHub或GitLab中同步PlayBook。這邊我是使用同步的方式，從GitHub同步PlayBook到AWX的task。</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-811a-9e68-c9dab9d624f8.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-8188-bcbe-ccb73449bd59.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h1 id="Step3-建立Hosts及Inventories"><a href="#Step3-建立Hosts及Inventories" class="headerlink" title="Step3. 建立Hosts及Inventories"></a>Step3. 建立Hosts及Inventories</h1><p>這邊為了方便，我架在自己本機</p>
+<h3 id="Hosts"><a href="#Hosts" class="headerlink" title="Hosts"></a>Hosts</h3><p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-81ec-b8fd-d294d01bc8fa.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h3 id="Inventories"><a href="#Inventories" class="headerlink" title="Inventories"></a>Inventories</h3><p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-817d-9199-d2874855d332.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-8192-a8c6-fb2749d97246.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h1 id="Step4-建立Template-運行Template"><a href="#Step4-建立Template-運行Template" class="headerlink" title="Step4. 建立Template &amp; 運行Template"></a>Step4. 建立Template &amp; 運行Template</h1><p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-814c-8ae3-c733619e4388.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>點擊運行</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-8194-8dc9-e861b65055d3.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>可以在output看到成功，並且可於K8S中確認Redis Pod有成功啟動</p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-815b-88e4-c2c0b8ee134a.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/%E4%BD%BF%E7%94%A8AWX_%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/111e09e7-188c-8158-82dc-d39054c632cb.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="補充更多Crediential-Type的用途"><a href="#補充更多Crediential-Type的用途" class="headerlink" title="補充更多Crediential Type的用途"></a>補充更多Crediential Type的用途</h2><p>Ansible AWX 提供了多種類型的憑證（Credential Types），這些憑證用於與不同的系統、服務和平台進行身份驗證。每個 Credential Type 都針對特定的應用場景進行設計，允許使用者安全地存儲和使用憑證來運行任務。以下是 AWX 支持的主要 Credential Types 介紹：</p>
+<h3 id="1-Machine（機器）"><a href="#1-Machine（機器）" class="headerlink" title="1. Machine（機器）"></a>1. Machine（機器）</h3><ul>
+<li><p>用途：用於通過 SSH、WinRM 等協議與遠程主機（Linux 或 Windows）進行通信。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：運行與遠程主機相關的 Ansible playbook，如部署應用程序、配置伺服器。</p>
+</li>
+</ul>
+<h3 id="2-Source-Control（源代碼控制）"><a href="#2-Source-Control（源代碼控制）" class="headerlink" title="2. Source Control（源代碼控制）"></a>2. Source Control（源代碼控制）</h3><ul>
+<li><p>用途：用於從 Git、Subversion、Mercurial 等版本控制系統中提取 Playbook 或腳本。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：自動化從 Git 或其他源代碼存儲庫拉取和運行 Playbook。</p>
+</li>
+</ul>
+<h3 id="3-Vault（保險庫）"><a href="#3-Vault（保險庫）" class="headerlink" title="3. Vault（保險庫）"></a>3. Vault（保險庫）</h3><ul>
+<li><p>用途：解鎖加密的 Ansible Vault 文件。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：當你的 Playbook 中包含加密的變量或文件時使用，以解密這些內容。</p>
+</li>
+</ul>
+<h3 id="4-Cloud（雲提供商）"><a href="#4-Cloud（雲提供商）" class="headerlink" title="4. Cloud（雲提供商）"></a>4. Cloud（雲提供商）</h3><ul>
+<li><p>用途：用於連接和管理不同的雲服務提供商。</p>
+</li>
+<li><p>AWS：</p>
+</li>
+<li><p>Google Compute Engine：</p>
+</li>
+<li><p>Azure Resource Manager：</p>
+</li>
+<li><p>用例：管理雲基礎設施，如在 AWS、GCP 或 Azure 上啟動虛擬機或配置資源。</p>
+</li>
+</ul>
+<h3 id="5-Network（網絡設備）"><a href="#5-Network（網絡設備）" class="headerlink" title="5. Network（網絡設備）"></a>5. Network（網絡設備）</h3><ul>
+<li><p>用途：用於通過 Telnet 或 SSH 連接網絡設備（如 Cisco 路由器、開關等）。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：管理和配置網絡設備。</p>
+</li>
+</ul>
+<h3 id="6-Kubernetes-OpenShift-API-Token"><a href="#6-Kubernetes-OpenShift-API-Token" class="headerlink" title="6. Kubernetes&#x2F;OpenShift API Token"></a>6. Kubernetes&#x2F;OpenShift API Token</h3><ul>
+<li><p>用途：通過 Kubernetes 或 OpenShift 的 API 與集群進行身份驗證。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：與 Kubernetes 集群互動、部署 Pod、管理集群中的資源。</p>
+</li>
+</ul>
+<h3 id="7-Red-Hat-OpenShift"><a href="#7-Red-Hat-OpenShift" class="headerlink" title="7. Red Hat OpenShift"></a>7. Red Hat OpenShift</h3><ul>
+<li><p>用途：專為 OpenShift 平台設計，允許 AWX 連接到 OpenShift 平台以進行容器應用部署。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：用於 OpenShift 容器平台的應用自動化部署。</p>
+</li>
+</ul>
+<h3 id="8-Ansible-Tower"><a href="#8-Ansible-Tower" class="headerlink" title="8. Ansible Tower"></a>8. Ansible Tower</h3><ul>
+<li><p>用途：用於 AWX 與其他 AWX&#x2F;Tower 實例交互。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：跨 AWX 實例進行協作自動化工作流。</p>
+</li>
+</ul>
+<h3 id="9-OpenStack"><a href="#9-OpenStack" class="headerlink" title="9. OpenStack"></a>9. OpenStack</h3><ul>
+<li><p>用途：與 OpenStack 平台進行交互以管理虛擬機和其他資源。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：自動化 OpenStack 環境的虛擬資源創建、管理。</p>
+</li>
+</ul>
+<h3 id="10-Satellite6"><a href="#10-Satellite6" class="headerlink" title="10. Satellite6"></a>10. Satellite6</h3><ul>
+<li><p>用途：用於與 Red Hat Satellite 6 進行交互來管理 Red Hat 訂閱和主機。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：管理 Red Hat 的訂閱和服務。</p>
+</li>
+</ul>
+<h3 id="11-GitHub-Personal-Access-Token"><a href="#11-GitHub-Personal-Access-Token" class="headerlink" title="11. GitHub Personal Access Token"></a>11. GitHub Personal Access Token</h3><ul>
+<li><p>用途：與 GitHub 互動時使用，如拉取私人存儲庫的 Playbook。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：從 GitHub 私有存儲庫提取 Playbook 或自動化 GitHub 工作流程。</p>
+</li>
+</ul>
+<h3 id="12-GitLab-Personal-Access-Token"><a href="#12-GitLab-Personal-Access-Token" class="headerlink" title="12. GitLab Personal Access Token"></a>12. GitLab Personal Access Token</h3><ul>
+<li><p>用途：與 GitLab 進行交互，主要用於克隆存儲庫。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：管理 GitLab 私有項目的自動化操作。</p>
+</li>
+</ul>
+<h3 id="13-HashiCorp-Vault"><a href="#13-HashiCorp-Vault" class="headerlink" title="13. HashiCorp Vault"></a>13. HashiCorp Vault</h3><ul>
+<li><p>用途：用於與 HashiCorp Vault 進行身份驗證，允許從 Vault 中檢索敏感數據。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：從 HashiCorp Vault 安全地檢索 API 密鑰、憑證等。</p>
+</li>
+</ul>
+<h3 id="14-Amazon-Elastic-Container-Registry-ECR"><a href="#14-Amazon-Elastic-Container-Registry-ECR" class="headerlink" title="14. Amazon Elastic Container Registry (ECR)"></a>14. Amazon Elastic Container Registry (ECR)</h3><ul>
+<li><p>用途：與 Amazon ECR（Elastic Container Registry）交互，以推送或拉取容器鏡像。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：將容器鏡像推送到 ECR 或從 ECR 中拉取鏡像。</p>
+</li>
+</ul>
+<h3 id="15-Custom（自定義憑證）"><a href="#15-Custom（自定義憑證）" class="headerlink" title="15. Custom（自定義憑證）"></a>15. Custom（自定義憑證）</h3><ul>
+<li><p>用途：AWX 允許用戶創建自定義憑證類型以滿足特定的身份驗證需求。</p>
+</li>
+<li><p>屬性：</p>
+</li>
+<li><p>用例：用於不支持的外部服務或 API。</p>
+</li>
+</ul>
+<p>這些憑證類型能夠靈活地支持不同的系統和平台，幫助自動化進程更為高效且安全。在 AWX 中，這些憑證存儲在加密的數據庫中，保證了敏感信息的安全性。</p>
+<p>Ansible AWX 的 Playbook 功能非常強大，並且可以與多種服務、平台和基礎設施進行互動。這得益於 Ansible 的模塊化架構和強大的社區支持，使其成為一個靈活且擴展性強的自動化工具。以下是 AWX 和 Playbook 在與各種服務交互時的特點和能力：</p>
+<h3 id="1-跨平台與多種環境互動"><a href="#1-跨平台與多種環境互動" class="headerlink" title="1. 跨平台與多種環境互動"></a>1. 跨平台與多種環境互動</h3><ul>
+<li><p>雲提供商：AWX 可以與 AWS、Azure、Google Cloud 等雲服務平台進行互動，支持虛擬機實例的創建、網絡設置、負載均衡器配置等操作。</p>
+</li>
+<li><p>容器編排工具：AWX 與 Kubernetes、OpenShift 等平台集成良好，能自動化容器應用的部署、升級和管理。</p>
+</li>
+<li><p>版本控制系統：AWX 可以與 Git、GitHub、GitLab 等源代碼管理工具交互，通過提取 Playbook 來自動化 CI&#x2F;CD 流程。</p>
+</li>
+<li><p>網絡設備：它可以與 Cisco、Juniper 等網絡設備進行自動化配置和管理，通過 SSH、API 等方式與設備進行交互。</p>
+</li>
+</ul>
+<h3 id="2-憑證管理與安全互動"><a href="#2-憑證管理與安全互動" class="headerlink" title="2. 憑證管理與安全互動"></a>2. 憑證管理與安全互動</h3><ul>
+<li>AWX 提供多種憑證類型，如雲提供商 API 憑證、SSH 密鑰、加密憑證等，支持自動化任務中對多種外部服務進行安全身份驗證。這使得 Playbook 能夠安全且自動化地執行各種敏感操作。</li>
+</ul>
+<h3 id="3-廣泛的模塊支持"><a href="#3-廣泛的模塊支持" class="headerlink" title="3. 廣泛的模塊支持"></a>3. 廣泛的模塊支持</h3><ul>
+<li><p>Ansible 擁有數千個官方和社區支持的模塊，幾乎涵蓋所有主要的 IT 基礎設施，包括服務器管理、數據庫操作、應用程序部署、網絡配置等。AWX 通過這些模塊調用 Playbook 可以執行各種複雜的操作任務。</p>
+</li>
+<li><p>常見模塊：</p>
+</li>
+</ul>
+<h3 id="4-自動化流程編排"><a href="#4-自動化流程編排" class="headerlink" title="4. 自動化流程編排"></a>4. 自動化流程編排</h3><ul>
+<li><p>AWX 可以編排多步驟的自動化流程，將多個服務、平台上的操作組織成一個完整的工作流。通過工作流模板，使用者可以指定不同 Playbook 的執行順序和條件，以處理更為複雜的 IT 任務。</p>
+</li>
+<li><p>工作流範例：</p>
+</li>
+</ul>
+<h3 id="5-跨服務器和網絡設備的並行操作"><a href="#5-跨服務器和網絡設備的並行操作" class="headerlink" title="5. 跨服務器和網絡設備的並行操作"></a>5. 跨服務器和網絡設備的並行操作</h3><ul>
+<li>AWX 允許對多個服務器或網絡設備同時進行並行操作。例如，可以用一個 Playbook 對數百台伺服器進行批量升級或配置更新，而不需要逐一操作。</li>
+</ul>
+<h3 id="6-靈活的擴展性與自定義"><a href="#6-靈活的擴展性與自定義" class="headerlink" title="6. 靈活的擴展性與自定義"></a>6. 靈活的擴展性與自定義</h3><ul>
+<li><p>自定義模塊和插件：如果 AWX 的內置模塊無法滿足需求，開發者可以通過撰寫自定義模塊或插件來擴展功能。這使得 AWX 幾乎可以與任何服務或系統進行集成，無論是內部私有 API，還是第三方 SaaS 服務。</p>
+</li>
+<li><p>自定義憑證：用戶可以創建自定義憑證類型來支持特殊的服務或平台的身份驗證。</p>
+</li>
+</ul>
+<h3 id="7-整合-DevOps-流程"><a href="#7-整合-DevOps-流程" class="headerlink" title="7. 整合 DevOps 流程"></a>7. 整合 DevOps 流程</h3><ul>
+<li><p>AWX 可以無縫整合到 DevOps 流程中，支持 CI&#x2F;CD、自動化基礎設施即代碼（IaC）等實踐。它能與 Jenkins、GitLab CI 等工具協作，實現完全自動化的代碼部署和測試。</p>
+</li>
+<li><p>它還支持基於事件觸發的自動化流程，例如當某個服務崩潰時自動觸發恢復操作。</p>
+</li>
+</ul>
+<h3 id="8-多租戶與角色基於訪問控制"><a href="#8-多租戶與角色基於訪問控制" class="headerlink" title="8. 多租戶與角色基於訪問控制"></a>8. 多租戶與角色基於訪問控制</h3><ul>
+<li>在大型組織中，AWX 支持多租戶模式，允許不同的團隊分別管理自己的憑證、Playbook、項目和環境，並通過角色基於訪問控制來保證不同用戶的操作範圍。</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Ansible/" class="category-chain-item">Ansible</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AWX/" class="print-no-link">#AWX</a>
+      
+        <a href="/tags/K8S/" class="print-no-link">#K8S</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>使用AWX 於K8S中部署服務</div>
+      <div>https://nero811.github.io/2024/09/30/使用AWX 於K8S中部署服務/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Jack Yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>發布於</div>
+          <div>2024年9月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>許可協議</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/09/29/Spring%20Cache/" title="Spring Cache">
+                        <span class="hidden-mobile">Spring Cache</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目錄</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜尋</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">關鍵字</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允許 JavaScript 運行的環境下瀏覽效果更佳</div>
+  </noscript>
+</body>
+</html>
