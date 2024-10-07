@@ -17,8 +17,8 @@
   <meta name="keywords" content="">
   
     <meta property="og:type" content="website">
-<meta property="og:title" content="標籤 - Keyclaok">
-<meta property="og:url" content="https://nero811.github.io/tags/Keyclaok/index.html">
+<meta property="og:title" content="Jack的後端工程師筆記">
+<meta property="og:url" content="https://nero811.github.io/page/2/index.html">
 <meta property="og:site_name" content="Jack的後端工程師筆記">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:author" content="Jack Yang">
@@ -28,7 +28,7 @@
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>標籤 - Keyclaok - Jack的後端工程師筆記</title>
+  <title>Jack的後端工程師筆記</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -109,7 +109,7 @@
   <header>
     
 
-<div class="header-inner" style="height: 80vh;">
+<div class="header-inner" style="height: 100vh;">
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
@@ -209,13 +209,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/undraw_Code_thinking_re_gka2.png') no-repeat center center; background-size: cover;">
+     style="background: url('/img/pexels-goumbik-574071.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">標籤 - Keyclaok</span>
+            <span id="subtitle" data-typed-text="行之苟有恆，久久自芬芳"></span>
           
         </div>
 
@@ -239,42 +239,54 @@
     
       <div class="container nopadding-x-md">
         <div id="board"
-          >
+          style="margin-top: 0">
           
           <div class="container">
             <div class="row">
               <div class="col-12 col-md-10 m-auto">
                 
 
-<div class="list-group">
-  <p class="h4">共有 3 篇文章</p>
-  <hr>
-  
-  
+
+  <div class="row mx-auto index-card">
     
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/15/JDK17%E7%AD%86%E8%A8%98/" target="_self">
+          JDK17 筆記
+        </a>
+      </h2>
+
       
-      <p class="h5">2024</p>
-    
-    <a href="/2024/08/18/%E5%AF%A6%E7%8F%BEToken%20Based%E7%9A%84Single%20Sign%20On(SSO)/" class="list-group-item list-group-item-action">
-      <time>08-18</time>
-      <div class="list-group-item-title">實現Token Based的Single Sign On(SSO)</div>
-    </a>
-  
-    
-    <a href="/2024/08/12/Spring-Session%20With%20Redis%20%E9%81%94%E5%88%B0Session%20%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/" class="list-group-item list-group-item-action">
-      <time>08-12</time>
-      <div class="list-group-item-title">Spring-Session With Redis 達到Session 集中式處理</div>
-    </a>
-  
-    
-    <a href="/2024/07/28/%E6%95%B4%E5%90%88Keycloak%E5%AF%A6%E7%8F%BESingle-Sign-On%20(SSO)%20%E5%8F%8A%20OAuth2.0%20with%20OpenId%20Connect/" class="list-group-item list-group-item-action">
-      <time>07-28</time>
-      <div class="list-group-item-title">整合Keycloak實現Single-Sign-On (SSO) 及 OAuth2.0 with OpenId Connect</div>
-    </a>
-  
-</div>
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/15/JDK17%E7%AD%86%E8%A8%98/" target="_self">
+        <div>
+          Multiline Strings原先在使用多行字串的時候是以下圖示 12345String text = &quot;Hello，&quot; +                &quot;How are &quot; +                &quot;you&quot;;  現在只需要使用 “”” 就可以表現多行字串了 1234567String a = &quot;&quot;&
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-15 22:24" pubdate>
+              2024-07-15
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
 
 
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+    </span>
+  </nav>
 
 
 
@@ -351,6 +363,21 @@
 <script  src="/js/events.js" ></script>
 <script  src="/js/plugins.js" ></script>
 
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
 
 
 

@@ -16,41 +16,28 @@
   <meta name="author" content="Jack Yang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="前言繼上一篇我們部屬完Minikube後，本篇目標接著部屬Ansible AWX到Minikube，並且透過Ansible AWX API來啟動template 安裝Ansible AWX 安裝helm&amp;設定環境變數  1curl https:&#x2F;&#x2F;get.helm.sh&#x2F;helm-v3.10.2-windows-amd64.tar.gz   依序執行以下指令  12helm repo ad">
+    <meta name="description" content="前言開發者在實務上難免會接觸到維運，而維運時一定會仰賴Log。在MVC架構下，想在服務獲得Http Request和回應給Client端Http Response時打印Log，若是土法煉鋼將Log寫在每個controller下，將會寫非常多的Code，在controller很多的情況下也很難管理。 本篇將透過覆寫servlet filter的方式，自訂義一個filter chain打印Http R">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Minikube部屬Ansible AWX">
-<meta property="og:url" content="https://nero811.github.io/2024/08/07/Minikube%E9%83%A8%E5%B1%ACAnsible%20AWX/index.html">
+<meta property="og:title" content="自訂義servlet filter">
+<meta property="og:url" content="https://nero811.github.io/2024/10/03/%E8%87%AA%E8%A8%82%E7%BE%A9servlet%20filter/index.html">
 <meta property="og:site_name" content="Jack的後端工程師筆記">
-<meta property="og:description" content="前言繼上一篇我們部屬完Minikube後，本篇目標接著部屬Ansible AWX到Minikube，並且透過Ansible AWX API來啟動template 安裝Ansible AWX 安裝helm&amp;設定環境變數  1curl https:&#x2F;&#x2F;get.helm.sh&#x2F;helm-v3.10.2-windows-amd64.tar.gz   依序執行以下指令  12helm repo ad">
+<meta property="og:description" content="前言開發者在實務上難免會接觸到維運，而維運時一定會仰賴Log。在MVC架構下，想在服務獲得Http Request和回應給Client端Http Response時打印Log，若是土法煉鋼將Log寫在每個controller下，將會寫非常多的Code，在controller很多的情況下也很難管理。 本篇將透過覆寫servlet filter的方式，自訂義一個filter chain打印Http R">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/7e2249b4-e477-44c6-9926-8621ecdb5f1d.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/83e26c43-93a7-4cd5-966d-b7ae2f7773a0.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/d20ec0ff-2c67-4799-94e6-7b687ab455ee.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/30a5698d-f782-44cb-9ecc-5c31b9155357.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/10f0b5a9-cde5-43ee-9ae4-f44bd12ee9d3.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/96422f21-4ea1-4fa1-91ed-05722e3f7ab1.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/0f2f421d-549f-42dd-b3b6-66feed709377.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/cb588083-5c6e-47ab-92e1-0f4c337d41e2.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/81db3991-b6df-4fb3-8a49-82bf8f7d757c.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/5b594f6b-949d-4561-8ecc-4278640b1322.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/e10dcd97-b01a-4a26-b670-6417097d99e5.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/4b7389ae-cd21-4159-bd93-86c986f4e525.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/e95ac213-a613-46d4-a6e3-b155269c41a4.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/09606e68-f4e2-40c9-ae81-d8a509c705a0.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/070a57bb-4a8a-4f87-8834-f142b9dd6c89.webp">
-<meta property="article:published_time" content="2024-08-07T15:40:05.213Z">
-<meta property="article:modified_time" content="2024-09-29T15:54:57.882Z">
+<meta property="og:image" content="https://nero811.github.io/image/%E8%87%AA%E8%A8%82%E7%BE%A9servlet_filter/e3af6d22-a276-45c6-8407-e12f9bef6368.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E8%87%AA%E8%A8%82%E7%BE%A9servlet_filter/2d962d2b-59d6-4d7d-87da-b9518d456f9a.webp">
+<meta property="article:published_time" content="2024-10-03T13:31:19.554Z">
+<meta property="article:modified_time" content="2024-10-03T13:33:37.180Z">
 <meta property="article:author" content="Jack Yang">
-<meta property="article:tag" content="AWX">
-<meta property="article:tag" content="K8S">
+<meta property="article:tag" content="Spring Boot">
+<meta property="article:tag" content="MainTain">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://nero811.github.io/image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/7e2249b4-e477-44c6-9926-8621ecdb5f1d.webp">
+<meta name="twitter:image" content="https://nero811.github.io/image/%E8%87%AA%E8%A8%82%E7%BE%A9servlet_filter/e3af6d22-a276-45c6-8407-e12f9bef6368.webp">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>Minikube部屬Ansible AWX - Jack的後端工程師筆記</title>
+  <title>自訂義servlet filter - Jack的後端工程師筆記</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -243,7 +230,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">Minikube部屬Ansible AWX</span>
+            <span id="subtitle">自訂義servlet filter</span>
           
         </div>
 
@@ -254,8 +241,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-08-07 23:40" pubdate>
-          2024年8月7日 晚上
+        <time datetime="2024-10-03 21:31" pubdate>
+          2024年10月3日 晚上
         </time>
       </span>
     
@@ -266,7 +253,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          888 字
+          573 字
         
       </span>
     
@@ -277,7 +264,7 @@
         
         
         
-          8 分鐘
+          5 分鐘
         
       </span>
     
@@ -322,132 +309,32 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Minikube部屬Ansible AWX</h1>
+            <h1 id="seo-header">自訂義servlet filter</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>繼上一篇我們部屬完Minikube後，本篇目標接著部屬Ansible AWX到Minikube，並且透過Ansible AWX API來啟動template</p>
-<h1 id="安裝Ansible-AWX"><a href="#安裝Ansible-AWX" class="headerlink" title="安裝Ansible AWX"></a>安裝Ansible AWX</h1><ol>
-<li>安裝helm&amp;設定環境變數</li>
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>開發者在實務上難免會接觸到維運，而維運時一定會仰賴Log。在MVC架構下，想在服務獲得Http Request和回應給Client端Http Response時打印Log，若是土法煉鋼將Log寫在每個controller下，將會寫非常多的Code，在controller很多的情況下也很難管理。</p>
+<p>本篇將透過覆寫servlet filter的方式，自訂義一個filter chain打印Http Request、Http Response的Log，進而大幅縮減要寫的Code，也讓維運起來更加方便。</p>
+<h1 id="範例代碼"><a href="#範例代碼" class="headerlink" title="範例代碼"></a>範例代碼</h1><h2 id="Filter"><a href="#Filter" class="headerlink" title="Filter"></a>Filter</h2><h3 id="重點說明"><a href="#重點說明" class="headerlink" title="重點說明:"></a>重點說明:</h3><ol>
+<li>使用ContentCachingRequestWrapper 、ContentCachingResponseWrapper 這兩個物件的原因</li>
 </ol>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">curl</span> https://get.helm.sh/helm-v3.<span class="hljs-number">10</span>.<span class="hljs-number">2</span>-windows-amd64.tar.gz<br></code></pre></td></tr></table></figure>
-
-<ol>
-<li>依序執行以下指令</li>
-</ol>
-<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">helm repo <span class="hljs-keyword">add</span> awx-<span class="hljs-keyword">operator</span> https://ansible.github.io/awx-<span class="hljs-keyword">operator</span>/<br>helm install — generate-<span class="hljs-type">name</span> awx-<span class="hljs-keyword">operator</span>/awx-<span class="hljs-keyword">operator</span><br></code></pre></td></tr></table></figure>
-
-<ol>
-<li>建立awx-demo.yaml 並執行</li>
-</ol>
-<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs dts"><span class="hljs-symbol">apiVersion:</span> awx.ansible.com/v1beta1<br><span class="hljs-symbol">kind:</span> AWX<br><span class="hljs-symbol">metadata:</span><br><span class="hljs-symbol">  name:</span> awx-demo<br><span class="hljs-symbol">spec:</span><br><span class="hljs-symbol">  service_type:</span> nodeport<br><br></code></pre></td></tr></table></figure>
-
-<p>kubectl apply -f awx-demo.yaml</p>
-<ol>
-<li>確認服務啟動</li>
-</ol>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">kubectl <span class="hljs-built_in">get</span> svc<br></code></pre></td></tr></table></figure>
-
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/7e2249b4-e477-44c6-9926-8621ecdb5f1d.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/83e26c43-93a7-4cd5-966d-b7ae2f7773a0.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<ol>
-<li>獲取minikube pod service Url:</li>
-</ol>
-<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ada">minikube service <span class="hljs-comment">--url &lt;service_name&gt;</span><br></code></pre></td></tr></table></figure>
-
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/d20ec0ff-2c67-4799-94e6-7b687ab455ee.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<ol>
-<li>使用default admin登入AWX</li>
-</ol>
-<p>ID: admin</p>
-<p>密碼使用以下指令並，並將結果透過base64 decode獲得</p>
-<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">kubectl <span class="hljs-keyword">get</span> secret awx-demo-<span class="hljs-keyword">admin</span>-<span class="hljs-keyword">password</span> -o jsonpath=’&#123;.data.<span class="hljs-keyword">password</span>&#125;’<span class="hljs-comment">-- getpassword</span><br></code></pre></td></tr></table></figure>
-
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/30a5698d-f782-44cb-9ecc-5c31b9155357.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/10f0b5a9-cde5-43ee-9ae4-f44bd12ee9d3.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/96422f21-4ea1-4fa1-91ed-05722e3f7ab1.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p>本文部屬是參考以下文章:</p>
-<p><a target="_blank" rel="noopener" href="https://medium.com/@caceresabelanibal/install-ansible-awx-on-kubernetes-docker-desktop-for-windows-97406dd64ab5">https:&#x2F;&#x2F;medium.com&#x2F;@caceresabelanibal&#x2F;install-ansible-awx-on-kubernetes-docker-desktop-for-windows-97406dd64ab5</a></p>
-<h1 id="AWX-簡介"><a href="#AWX-簡介" class="headerlink" title="AWX 簡介"></a>AWX 簡介</h1><h2 id="Project"><a href="#Project" class="headerlink" title="Project"></a>Project</h2><p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/0f2f421d-549f-42dd-b3b6-66feed709377.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p>Ansible playbook 的邏輯集合。</p>
-<p>我們通過以下兩種方式管理 playbook 和 playbook 目錄：</p>
-<ol>
-<li><p>將placybook手動放置在伺服器上的專案基礎路徑下，預設路徑是&#x2F;var&#x2F;lib&#x2F;awx&#x2F;projects(可變更)</p>
-</li>
-<li><p>將 playbook 放置到 AWX 支援的源代碼管理 (SCM) 系統中，包括 Git、Subversion 和 Red Hat Insights。</p>
-</li>
-</ol>
-<p>詳細可參考官方文件:</p>
-<p><a target="_blank" rel="noopener" href="https://ansible.readthedocs.io/projects/awx/en/latest/userguide/projects.html">https://ansible.readthedocs.io/projects/awx/en/latest/userguide/projects.html</a></p>
-<h2 id="Inventories"><a href="#Inventories" class="headerlink" title="Inventories"></a>Inventories</h2><p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/cb588083-5c6e-47ab-92e1-0f4c337d41e2.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p>Inventories是一個主機的集合，這些主機是執行作業的對象，與 Ansible 清單文件相同。清單被劃分為多個組，這些組包含實際的主機。組可以手動添加，通過在 AWX 中輸入主機名稱，或從其支持的雲端供應商獲取。</p>
-<p>詳細可參考官方文件:</p>
-<p><a target="_blank" rel="noopener" href="https://ansible.readthedocs.io/projects/awx/en/latest/userguide/inventories.html">https://ansible.readthedocs.io/projects/awx/en/latest/userguide/inventories.html</a></p>
-<h2 id="Job-Templates"><a href="#Job-Templates" class="headerlink" title="Job Templates"></a>Job Templates</h2><p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/81db3991-b6df-4fb3-8a49-82bf8f7d757c.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p>AWX 的模板（Template）是一個定義和參數集，用於運行 Ansible 作業。模板在多次執行相同作業時非常有用，並且有助於重用 Ansible playbook 內容以及團隊之間的協作。以下是有關 AWX 模板的一些詳細介紹：</p>
-<h3 id="作業範本的功能"><a href="#作業範本的功能" class="headerlink" title="作業範本的功能"></a>作業範本的功能</h3><ol>
-<li>標準化執行：</li>
-</ol>
-<ul>
-<li>作業範本定義了如何運行特定的 Ansible 作業，包括指定的 playbook、inventory、credential 等。</li>
-<li>範本允許您多次重複執行相同的作業，而不需要每次都重新配置參數。</li>
-</ul>
+<p>因為ServletRequest 、ServletResponse  Flow的特性是只能讀取一次，在第一次讀取完後就不能取得內容，有無法重複操作的特性。應此Spring 提供了ContentCachingRequestWrapper 和ContentCachingResponseWrapper  讓我們可以先將ServletRequest 、ServletResponse  的內容暫存起來重複使用。</p>
 <ol start="2">
-<li>重用和協作：</li>
+<li>chain.doFilter(requestWrapper, responseWrapper); 位置非常重要</li>
 </ol>
-<ul>
-<li>範本促進了 playbook 內容的重用，不同的團隊成員可以共享和協作使用相同的範本。</li>
-<li>這樣可以確保操作的一致性和可靠性。</li>
-</ul>
+<p>原理說明：<br>chain.doFilter 前面的代碼：<br>任何在 chain.doFilter(requestWrapper, responseWrapper); 之前的程式碼都會在請求進入下一個過濾器或目標資源之前執行。通常，這是你用來處理或修改Request的時機，例如記錄Request Log、驗證Request資料等。<br>chain.doFilter 後的程式碼：<br>任何在 chain.doFilter(requestWrapper, responseWrapper); 之後的程式碼會在回應從下一個過濾器或目標資源返回後執行。通常，這部分程式碼用來處理或修改Response，例如記錄Response Log。</p>
 <ol start="3">
-<li>自動化和編排：</li>
+<li>responseWrapper.copyBodyToResponse(); 將ServletResponse  copy回去</li>
 </ol>
-<ul>
-<li>範本可以用於自動化工作流的一部分，並且可以與其他範本或作業鏈接起來，形成複雜的自動化編排。</li>
-</ul>
-<h3 id="如何使用模板"><a href="#如何使用模板" class="headerlink" title="如何使用模板"></a>如何使用模板</h3><ol>
-<li>創建模板：</li>
-</ol>
-<ul>
-<li>您可以通過 AWX 的 Web 界面創建新的作業範本。</li>
-<li>創建過程中需要選擇 playbook、inventory、credential，以及其他運行參數。</li>
-</ul>
-<ol start="2">
-<li>管理模板：</li>
-</ol>
-<ul>
-<li>AWX 提供了一個範本菜單，可以查看當前所有可用的作業範本。</li>
-<li>預設視圖是折疊的（簡潔模式），顯示範本名稱、範本類型和最後一次運行作業的時間戳。</li>
-<li>您可以點擊展開（每個條目旁邊的箭頭）以查看更多資訊，或根據範本的各種字段和屬性進行搜索和排序。</li>
-</ul>
-<ol start="3">
-<li>運行模板：</li>
-</ol>
-<ul>
-<li>當您需要執行作業時，只需選擇相應的範本，並點擊運行。</li>
-<li>您還可以為範本設置定時運行計劃，實現定期自動化作業。<br>參考官方文件:</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://ansible.readthedocs.io/projects/awx/en/latest/userguide/job_templates.html">https://ansible.readthedocs.io/projects/awx/en/latest/userguide/job_templates.html</a></p>
-<h1 id="操作AWX-API啟動Template"><a href="#操作AWX-API啟動Template" class="headerlink" title="操作AWX API啟動Template"></a>操作AWX API啟動Template</h1><p>當我們輸入<a href="http://domain:port/api/v2，就可以看到AWX自己的原生REST">http://domain:port/api/v2，就可以看到AWX自己的原生REST</a> API</p>
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/5b594f6b-949d-4561-8ecc-4278640b1322.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<h2 id="STEPS"><a href="#STEPS" class="headerlink" title="STEPS"></a>STEPS</h2><ol>
-<li>POST api&#x2F;v2&#x2F;tokens</li>
-</ol>
-<p> 取得Token</p>
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/e10dcd97-b01a-4a26-b670-6417097d99e5.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<ol>
-<li>GET api&#x2F;v2&#x2F;job_templates</li>
-</ol>
-<p>帶入1. 的Token取得 templates list</p>
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/4b7389ae-cd21-4159-bd93-86c986f4e525.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<ol>
-<li>POST api&#x2F;v2&#x2F;job_templates&#x2F;{id}&#x2F;launch&#x2F;</li>
-</ol>
-<p>帶入1. 的Token、2.獲得的templateId啟動 template</p>
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/e95ac213-a613-46d4-a6e3-b155269c41a4.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/09606e68-f4e2-40c9-ae81-d8a509c705a0.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p><img src="/./image/Minikube%E9%83%A8%E5%B1%ACAnsible_AWX/070a57bb-4a8a-4f87-8834-f142b9dd6c89.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>如我們在1.所說，ServletResponse  我們一開始已經先將ServletResponse 儲存在Cache當中，此時原本的ServletResponse  已經無法再獲得資料。因此我們必須將ServletResponse Copy回去，否則client端將無法獲得任何的Response。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RequestFilter</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Filter</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">LOG</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(RequestFilter.class);<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">doFilter</span><span class="hljs-params">(ServletRequest request, ServletResponse response, FilterChain chain)</span> <span class="hljs-keyword">throws</span> IOException, ServletException &#123;<br>        <span class="hljs-type">ContentCachingRequestWrapper</span> <span class="hljs-variable">requestWrapper</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ContentCachingRequestWrapper</span>((HttpServletRequest) request);<br>        <span class="hljs-type">ContentCachingResponseWrapper</span> <span class="hljs-variable">responseWrapper</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ContentCachingResponseWrapper</span>((HttpServletResponse) response);<br><br>        <span class="hljs-comment">// Log request</span><br>        logRequest(requestWrapper);<br><br>        chain.doFilter(requestWrapper, responseWrapper);<br><br>        <span class="hljs-comment">// Log response</span><br>        logResponse(responseWrapper);<br><br>        responseWrapper.copyBodyToResponse();<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">logRequest</span><span class="hljs-params">(ContentCachingRequestWrapper requestWrapper)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>        LOG.info(<span class="hljs-string">&quot;[Log] Received Request -&gt; URI: &#123;&#125;, Method: &#123;&#125;&quot;</span>, requestWrapper.getRequestURI(), requestWrapper.getMethod());<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">logResponse</span><span class="hljs-params">(ContentCachingResponseWrapper responseWrapper)</span> &#123;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">responseBody</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(responseWrapper.getContentAsByteArray(), StandardCharsets.UTF_8);<br>        LOG.info(<span class="hljs-string">&quot;[Log] Sending Response -&gt; Status: &#123;&#125;, Body: &#123;&#125;&quot;</span>, responseWrapper.getStatus(), responseBody);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a>Controller</h1><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-meta">@RestController</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RequestControler</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> static Logger LOG = LoggerFactory.getLogger(RequestControler.<span class="hljs-keyword">class</span>);<br><br>    <span class="hljs-meta">@PostMapping(<span class="hljs-string">&quot;/test&quot;</span>)</span><br>    <span class="hljs-keyword">public</span> ResponseEntity&lt;String&gt; testFilter(<span class="hljs-meta">@RequestBody</span> RequestDto requestDto) &#123;<br>        LOG.info(<span class="hljs-string">&quot;Controller get request: &#123;&#125;. Do Something.&quot;</span>, requestDto);<br>        <span class="hljs-keyword">return</span> ResponseEntity.ok(<span class="hljs-string">&quot;Success&quot;</span>);<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<h1 id="驗證"><a href="#驗證" class="headerlink" title="驗證:"></a>驗證:</h1><p>這樣我們就可以透過Filter取得Request的URI和Http Method，得到一個服務完整的LOG，這樣維運起來就很方便明瞭了。</p>
+<p><img src="/./image/%E8%87%AA%E8%A8%82%E7%BE%A9servlet_filter/e3af6d22-a276-45c6-8407-e12f9bef6368.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/%E8%87%AA%E8%A8%82%E7%BE%A9servlet_filter/2d962d2b-59d6-4d7d-87da-b9518d456f9a.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
 
                 
               </div>
@@ -466,7 +353,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Ansible/" class="category-chain-item">Ansible</a>
+  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
   
   
 
@@ -481,9 +368,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/AWX/" class="print-no-link">#AWX</a>
+        <a href="/tags/Spring-Boot/" class="print-no-link">#Spring Boot</a>
       
-        <a href="/tags/K8S/" class="print-no-link">#K8S</a>
+        <a href="/tags/MainTain/" class="print-no-link">#MainTain</a>
       
     </div>
   
@@ -495,8 +382,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Minikube部屬Ansible AWX</div>
-      <div>https://nero811.github.io/2024/08/07/Minikube部屬Ansible AWX/</div>
+      <div>自訂義servlet filter</div>
+      <div>https://nero811.github.io/2024/10/03/自訂義servlet filter/</div>
     </div>
     <div class="license-meta">
       
@@ -508,7 +395,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>發布於</div>
-          <div>2024年8月7日</div>
+          <div>2024年10月3日</div>
         </div>
       
       
@@ -540,18 +427,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/08/12/Spring-Session%20With%20Redis%20%E9%81%94%E5%88%B0Session%20%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/" title="Spring-Session With Redis 達到Session 集中式處理">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Spring-Session With Redis 達到Session 集中式處理</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/08/04/%E4%BD%BF%E7%94%A8Minikube%20+%20Ansible%E9%83%A8%E5%B1%AC%E5%BE%AE%E6%9C%8D%E5%8B%99/" title="使用Minikube + Ansible部屬微服務">
-                        <span class="hidden-mobile">使用Minikube + Ansible部屬微服務</span>
+                      <a href="/2024/09/30/%E4%BD%BF%E7%94%A8AWX%20%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/" title="使用AWX 於K8S中部署服務">
+                        <span class="hidden-mobile">使用AWX 於K8S中部署服務</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
