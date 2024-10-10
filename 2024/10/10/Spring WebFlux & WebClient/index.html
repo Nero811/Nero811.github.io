@@ -1,0 +1,808 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-TW" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icons8-code-48.png">
+  <link rel="icon" href="/img/icons8-code-48.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Jack Yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言在 Spring 中，WebClient 和 RestTemplate 是兩個常見的 HTTP 客戶端工具。隨著 Spring 5 (Spring Boot 2.0.0)的引入，WebClient 成為了建議使用的非同步 HTTP 客戶端工具，而 RestTemplate 則是傳統的同步 HTTP 客戶端。 本篇將介紹WebClient ，以及比較WebClient 、 RestTemplat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring WebFlux &amp; WebClient">
+<meta property="og:url" content="https://nero811.github.io/2024/10/10/Spring%20WebFlux%20&%20WebClient/index.html">
+<meta property="og:site_name" content="Jack的後端工程師筆記">
+<meta property="og:description" content="前言在 Spring 中，WebClient 和 RestTemplate 是兩個常見的 HTTP 客戶端工具。隨著 Spring 5 (Spring Boot 2.0.0)的引入，WebClient 成為了建議使用的非同步 HTTP 客戶端工具，而 RestTemplate 則是傳統的同步 HTTP 客戶端。 本篇將介紹WebClient ，以及比較WebClient 、 RestTemplat">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://nero811.github.io/image/Spring_WebFlux_&_WebClient/cf9ab423-967f-4f05-8318-67bd2f4a1df6.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Spring_WebFlux_&_WebClient/bbe45354-bcd7-4cba-9c36-da25973f3749.webp">
+<meta property="article:published_time" content="2024-10-10T09:47:18.343Z">
+<meta property="article:modified_time" content="2024-10-10T09:51:54.172Z">
+<meta property="article:author" content="Jack Yang">
+<meta property="article:tag" content="Spring WebFlux">
+<meta property="article:tag" content="Spring MVC">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://nero811.github.io/image/Spring_WebFlux_&_WebClient/cf9ab423-967f-4f05-8318-67bd2f4a1df6.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Spring WebFlux &amp; WebClient - Jack的後端工程師筆記</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"nero811.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":["home"]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Coding Is Life</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首頁</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>歸檔</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分類</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>標籤</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>關於</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/undraw_Programming_re_kg9v.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">Spring WebFlux & WebClient</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-10-10 17:47" pubdate>
+          2024年10月10日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          18 分鐘
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Spring WebFlux &amp; WebClient</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在 Spring 中，<code>WebClient</code> 和 <code>RestTemplate</code> 是兩個常見的 HTTP 客戶端工具。隨著 Spring 5 (Spring Boot 2.0.0)的引入，<code>WebClient</code> 成為了建議使用的非同步 HTTP 客戶端工具，而 <code>RestTemplate</code> 則是傳統的同步 HTTP 客戶端。</p>
+<p>本篇將介紹<code>WebClient</code> ，以及比較<code>WebClient</code> 、 <code>RestTemplate</code>的優缺點，並且實作<code>WebClient</code> 的非同步作法與撰寫Unit Test。</p>
+<h1 id="Spring-WebFlux介紹"><a href="#Spring-WebFlux介紹" class="headerlink" title="Spring WebFlux介紹"></a>Spring WebFlux介紹</h1><h2 id="Reactor-框架"><a href="#Reactor-框架" class="headerlink" title="Reactor 框架"></a>Reactor 框架</h2><p>Reactor是基於JVM的非阻塞API，它直接利用了JDK 8中的API，如CompletableFuture、Stream和Duration等。此外，Reactor還實現了Reactive Streams標準，確保了與其他響應式程式庫的兼容性。</p>
+<p>Reactor 提供的主要特性：</p>
+<ul>
+<li><p>非阻塞編程：適合處理 I&#x2F;O 密集型任務，如網路請求或DB I&#x2F;O。</p>
+</li>
+<li><p>異步數據流：通過 <code>Mono</code> 和 <code>Flux</code>，支持異步處理。</p>
+</li>
+<li><p>豐富的運算子：提供轉換（<code>map</code>、<code>flatMap</code>）、過濾（<code>filter</code>）、錯誤處理（<code>onErrorResume</code>）、組合（<code>concat</code>、<code>merge</code>）等多種運算子來處理數據流。</p>
+</li>
+</ul>
+<p>而在Spring  5中引入的Spring WebFlux底層就使用了reactor-netty，而reactor-netty又引用了Reactor。進而與Spring MVC ，基於同步、阻塞請求的模型產生了互補的作用。</p>
+<h2 id="比較Spring-Webflux、Spring-MVC"><a href="#比較Spring-Webflux、Spring-MVC" class="headerlink" title="比較Spring Webflux、Spring MVC"></a>比較Spring Webflux、Spring MVC</h2><table>
+<thead>
+<tr>
+<th><strong>特性</strong></th>
+<th><strong>Spring WebFlux</strong></th>
+<th><strong>Spring MVC</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>並發模型</strong></td>
+<td>非阻塞、事件驅動，基於 Reactor</td>
+<td>阻塞、線程每請求一個線程</td>
+</tr>
+<tr>
+<td><strong>阻塞與非阻塞</strong></td>
+<td>非阻塞 (Non-blocking)</td>
+<td>阻塞 (Blocking)</td>
+</tr>
+<tr>
+<td><strong>編程抽象</strong></td>
+<td>使用 <code>Mono</code> 和 <code>Flux</code></td>
+<td>使用傳統的同步返回值</td>
+</tr>
+<tr>
+<td><strong>線程管理</strong></td>
+<td>基於事件循環 (Event-loop)，少量線程處理大量請求</td>
+<td>每個請求佔用一個線程</td>
+</tr>
+<tr>
+<td><strong>請求處理模式</strong></td>
+<td>異步反應式請求處理 (Reactive)</td>
+<td>同步阻塞請求處理 (Synchronous)</td>
+</tr>
+<tr>
+<td><strong>適用場景</strong></td>
+<td>高併發、I&#x2F;O 密集型應用場景</td>
+<td>CPU 密集型或 I&#x2F;O 不頻繁的應用場景</td>
+</tr>
+<tr>
+<td><strong>運行環境</strong></td>
+<td>支持 Servlet 3.1+ (非阻塞 I&#x2F;O)、Netty、Undertow</td>
+<td>主要基於 Servlet API</td>
+</tr>
+<tr>
+<td><strong>性能</strong></td>
+<td>優於處理大量並行請求的應用</td>
+<td>適合較低併發的應用</td>
+</tr>
+<tr>
+<td><strong>開發難度</strong></td>
+<td>學習曲線較高，需要了解反應式編程模型</td>
+<td>容易上手，基於傳統的同步阻塞模式</td>
+</tr>
+<tr>
+<td><strong>官方推薦</strong></td>
+<td>Spring 5 後推薦 WebFlux 作為新項目選擇</td>
+<td>Spring 5 後逐漸不再推薦，主推 WebFlux</td>
+</tr>
+</tbody></table>
+<h2 id="比較WebClient、RestTemplate"><a href="#比較WebClient、RestTemplate" class="headerlink" title="比較WebClient、RestTemplate"></a>比較WebClient、RestTemplate</h2><table>
+<thead>
+<tr>
+<th></th>
+<th><strong>WebClient</strong></th>
+<th><strong>RestTemplate</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>優點</strong></td>
+<td>1. 支持非同步&#x2F;非阻塞編程，適合處理高並發場景。<br>2. 作為 Spring 5 的新功能，WebClient 持續獲得優化。</td>
+<td>1. 簡單易用：同步編程模式，與一般的 Java 開發模式非常類似，開發者容易上手。<br>2. 廣泛使用：由於它是 Spring 中較早引入的工具，在很多項目中已被廣泛使用並且經過長期驗證。</td>
+</tr>
+<tr>
+<td><strong>缺點</strong></td>
+<td>1. 需要學習非同步、非阻塞與 Mono、Flux 等概念，學習曲線較長。</td>
+<td>1. 無法非同步處理：RestTemplate 只支持同步請求，無法滿足高併發和需要異步處理的場景。<br>2. 性能瓶頸：同步阻塞導致大量 HTTP 請求時會阻塞線程，進而引發性能瓶頸。<br>3. 即將淘汰：Spring 官方已不再推薦 RestTemplate (不再進行優化)，建議新項目使用 WebClient。</td>
+</tr>
+</tbody></table>
+<h2 id="Mono與Flux操作方式"><a href="#Mono與Flux操作方式" class="headerlink" title="Mono與Flux操作方式"></a>Mono與Flux操作方式</h2><h3 id="1-Mono-範例"><a href="#1-Mono-範例" class="headerlink" title="1. Mono 範例"></a>1. Mono 範例</h3><p><code>Mono</code> 表示一個包含 0 或 1 個元素的反應式流，通常用於表示單個異步結果。</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs wren"><span class="hljs-keyword">import</span> <span class="hljs-variable">reactor</span>.<span class="hljs-property">core</span>.<span class="hljs-property">publisher</span>.<span class="hljs-property">Mono</span>;<br><br><span class="hljs-variable">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MonoExample</span> &#123;<br>    <span class="hljs-variable">public</span> <span class="hljs-keyword">static</span> <span class="hljs-variable">void</span> <span class="hljs-title function_">main</span>(<span class="hljs-params">String</span>[] <span class="hljs-params">args</span>) &#123;<br>        <span class="hljs-comment">// 創建一個包含單個元素的 Mono</span><br>        <span class="hljs-title class_">Mono</span><span class="hljs-operator">&lt;</span><span class="hljs-title class_">String</span><span class="hljs-operator">&gt;</span> <span class="hljs-variable">mono</span> <span class="hljs-operator">=</span> <span class="hljs-title class_">Mono</span>.<span class="hljs-property">just</span>(<span class="hljs-string">&quot;Hello, Mono!&quot;</span>);<br><br>        <span class="hljs-comment">// 訂閱 Mono 並處理結果</span><br>        <span class="hljs-variable">mono</span>.<span class="hljs-property">subscribe</span>(<span class="hljs-variable">result</span> <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span> <span class="hljs-title class_">System</span>.<span class="hljs-property">out</span>.<span class="hljs-property">println</span>(<span class="hljs-variable">result</span>),<br>                       <span class="hljs-variable">error</span> <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span> <span class="hljs-title class_">System</span>.<span class="hljs-property">err</span>.<span class="hljs-property">println</span>(<span class="hljs-string">&quot;Error: &quot;</span> <span class="hljs-operator">+</span> <span class="hljs-variable">error</span>),<br>                       () <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span> <span class="hljs-title class_">System</span>.<span class="hljs-property">out</span>.<span class="hljs-property">println</span>(<span class="hljs-string">&quot;Completed&quot;</span>));<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>output:</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey"><span class="hljs-built_in">Hello,</span> Mono!<br>Completed<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-Flux-範例"><a href="#2-Flux-範例" class="headerlink" title="2. Flux 範例"></a>2. Flux 範例</h3><p><code>Flux</code> 表示一個包含 0 到 N 個元素的反應式流，適合用於處理多個異步結果。</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs wren"><span class="hljs-keyword">import</span> <span class="hljs-variable">reactor</span>.<span class="hljs-property">core</span>.<span class="hljs-property">publisher</span>.<span class="hljs-property">Flux</span>;<br><br><span class="hljs-variable">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">FluxExample</span> &#123;<br>    <span class="hljs-variable">public</span> <span class="hljs-keyword">static</span> <span class="hljs-variable">void</span> <span class="hljs-title function_">main</span>(<span class="hljs-params">String</span>[] <span class="hljs-params">args</span>) &#123;<br>        <span class="hljs-comment">// 創建一個包含多個元素的 Flux</span><br>        <span class="hljs-title class_">Flux</span><span class="hljs-operator">&lt;</span><span class="hljs-title class_">String</span><span class="hljs-operator">&gt;</span> <span class="hljs-variable">flux</span> <span class="hljs-operator">=</span> <span class="hljs-title class_">Flux</span>.<span class="hljs-property">just</span>(<span class="hljs-string">&quot;Hello&quot;</span>, <span class="hljs-string">&quot;World&quot;</span>, <span class="hljs-string">&quot;from&quot;</span>, <span class="hljs-string">&quot;Flux&quot;</span>);<br><br>        <span class="hljs-comment">// 訂閱 Flux 並處理每個元素</span><br>        <span class="hljs-variable">flux</span>.<span class="hljs-property">subscribe</span>(<br>            <span class="hljs-variable">result</span> <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span> <span class="hljs-title class_">System</span>.<span class="hljs-property">out</span>.<span class="hljs-property">println</span>(<span class="hljs-variable">result</span>),<br>            <span class="hljs-variable">error</span> <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span> <span class="hljs-title class_">System</span>.<span class="hljs-property">err</span>.<span class="hljs-property">println</span>(<span class="hljs-string">&quot;Error: &quot;</span> <span class="hljs-operator">+</span> <span class="hljs-variable">error</span>),<br>            () <span class="hljs-operator">-</span><span class="hljs-operator">&gt;</span> <span class="hljs-title class_">System</span>.<span class="hljs-property">out</span>.<span class="hljs-property">println</span>(<span class="hljs-string">&quot;Completed&quot;</span>)<br>        );<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>output:</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs angelscript">Hello<br>World<br><span class="hljs-keyword">from</span><br>Flux<br>Completed<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-subscribe-與block"><a href="#3-subscribe-與block" class="headerlink" title="3. subscribe()與block()"></a>3. subscribe()與block()</h3><p><code>subscribe()</code>:</p>
+<ul>
+<li><p>屬於非同步、非阻塞的操作。</p>
+</li>
+<li><p>當你調用 <code>subscribe()</code> 時，它會註冊一個回調函數來處理 <code>Mono</code> 或 <code>Flux</code> 中的結果，但不會等待結果。它允許應用繼續執行其他操作，並在數據流有結果後以非阻塞的方式處理它們。</p>
+</li>
+<li><p>適合在需要異步處理數據流的場景中使用，比如在高併發應用中。</p>
+</li>
+</ul>
+<p>範例:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java">Mono&lt;String&gt; mono = Mono.just(<span class="hljs-string">&quot;Hello&quot;</span>);<br>mono.subscribe(result -&gt; System.out.println(result));  <span class="hljs-comment">// 非阻塞，立即返回，異步打印結果</span><br></code></pre></td></tr></table></figure>
+
+<p><code>block()</code>:</p>
+<ul>
+<li><p>屬於同步、阻塞的操作。</p>
+</li>
+<li><p>當你調用 <code>block()</code> 時，它會阻塞當前線程，直到 <code>Mono</code> 或 <code>Flux</code> 完成並返回結果。這類似於傳統的同步方法，它會等待結果返回，適合需要在當前線程中立即獲取結果的場景。</p>
+</li>
+<li><p>不建議在需要高併發或反應式應用中頻繁使用，因為它會破壞非阻塞模型的優勢。</p>
+</li>
+</ul>
+<p>範例:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">Mono&lt;String&gt; mono = Mono.just(<span class="hljs-string">&quot;Hello&quot;</span>);<br><span class="hljs-type">String</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> mono.block();  <span class="hljs-comment">// 阻塞，等待結果返回</span><br>System.out.println(result);    <span class="hljs-comment">// 打印結果</span><br><br></code></pre></td></tr></table></figure>
+
+<h1 id="實作程式碼"><a href="#實作程式碼" class="headerlink" title="實作程式碼"></a>實作程式碼</h1><h2 id="同步、阻塞實作"><a href="#同步、阻塞實作" class="headerlink" title="同步、阻塞實作"></a>同步、阻塞實作</h2><p>使用<code>block()</code> 方法</p>
+<p><code>block()</code> 是一種同步操作，會阻塞當前線程，直到 <code>Mono</code> 或 <code>Flux</code> 完成並返回結果，或者發生錯誤。這個方法是從反應式流中提取數據的最直接方式，但它會使非阻塞的反應式流變成阻塞操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.example.webclient;<br><br><span class="hljs-keyword">import</span> org.springframework.boot.autoconfigure.SpringBootApplication;<br><span class="hljs-keyword">import</span> org.springframework.web.reactive.function.client.WebClient;<br><br><span class="hljs-meta">@SpringBootApplication</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">WebclientApplication</span> &#123;<br><br>	<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>		<span class="hljs-type">WebClient</span> <span class="hljs-variable">client</span> <span class="hljs-operator">=</span> WebClient.create(<span class="hljs-string">&quot;https://jsonplaceholder.typicode.com&quot;</span>);<br><br>		<span class="hljs-comment">// 創建要發送的請求體</span><br>		<span class="hljs-type">PostRequestBody</span> <span class="hljs-variable">requestBody</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PostRequestBody</span>(<span class="hljs-string">&quot;foo&quot;</span>, <span class="hljs-string">&quot;bar&quot;</span>);<br><br>		<span class="hljs-comment">// 使用 block() 方法同步獲取結果，這將會阻塞線程直到響應返回</span><br>		<span class="hljs-type">String</span> <span class="hljs-variable">response</span> <span class="hljs-operator">=</span> client.post()<br>				.uri(<span class="hljs-string">&quot;/posts&quot;</span>)<br>				.bodyValue(requestBody)  <span class="hljs-comment">// 設定RequestBody</span><br>				.retrieve()<br>				.bodyToMono(String.class)<br>				.block();  <span class="hljs-comment">// 阻塞操作</span><br><br>		System.out.println(<span class="hljs-string">&quot;Response: &quot;</span> + response);<br>	&#125;<br>	<br>	<span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PostRequestBody</span> &#123;<br>		<span class="hljs-keyword">private</span> String title;<br>		<span class="hljs-keyword">private</span> String body;<br><br>		<span class="hljs-keyword">public</span> <span class="hljs-title function_">PostRequestBody</span><span class="hljs-params">(String title, String body)</span> &#123;<br>			<span class="hljs-built_in">this</span>.title = title;<br>			<span class="hljs-built_in">this</span>.body = body;<br>		&#125;<br><br>		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">getTitle</span><span class="hljs-params">()</span> &#123;<br>			<span class="hljs-keyword">return</span> title;<br>		&#125;<br><br>		<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setTitle</span><span class="hljs-params">(String title)</span> &#123;<br>			<span class="hljs-built_in">this</span>.title = title;<br>		&#125;<br><br>		<span class="hljs-keyword">public</span> String <span class="hljs-title function_">getBody</span><span class="hljs-params">()</span> &#123;<br>			<span class="hljs-keyword">return</span> body;<br>		&#125;<br><br>		<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setBody</span><span class="hljs-params">(String body)</span> &#123;<br>			<span class="hljs-built_in">this</span>.body = body;<br>		&#125;<br>	&#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/Spring_WebFlux_&_WebClient/cf9ab423-967f-4f05-8318-67bd2f4a1df6.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="非同步、非阻塞實作"><a href="#非同步、非阻塞實作" class="headerlink" title="非同步、非阻塞實作"></a>非同步、非阻塞實作</h2><h3 id="使用subscribe-方法"><a href="#使用subscribe-方法" class="headerlink" title="使用subscribe() 方法"></a>使用<code>subscribe()</code> 方法</h3><p><code>subscribe()</code> 是一個非同步操作，它不會阻塞線程，而是讓當前線程繼續執行。當數據流中的事件（值、錯誤、完成）發生時，<code>subscribe()</code> 提供的回調函數會被觸發。這使得應用程序可以在非阻塞的方式下處理數據，從而實現更高效的併發。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">import</span> org.springframework.web.reactive.function.client.WebClient;<br><span class="hljs-keyword">import</span> reactor.core.publisher.Mono;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">WebClientPostSubscribeExample</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>        <span class="hljs-type">WebClient</span> <span class="hljs-variable">client</span> <span class="hljs-operator">=</span> WebClient.create(<span class="hljs-string">&quot;https://jsonplaceholder.typicode.com&quot;</span>);<br><br>        <span class="hljs-type">PostRequestBody</span> <span class="hljs-variable">requestBody</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PostRequestBody</span>(<span class="hljs-string">&quot;foo&quot;</span>, <span class="hljs-string">&quot;bar&quot;</span>);<br><br>        <span class="hljs-comment">// 使用 subscribe() 進行非同步非阻塞請求處理</span><br>        Mono&lt;String&gt; responseMono = client.post()<br>                                          .uri(<span class="hljs-string">&quot;/posts&quot;</span>)<br>                                          .bodyValue(requestBody)  <br>                                          .retrieve()<br>                                          .bodyToMono(String.class);<br><br>        <span class="hljs-comment">// 非阻塞地處理response</span><br>        responseMono.subscribe(<br>            response -&gt; System.out.println(<span class="hljs-string">&quot;Response: &quot;</span> + response),  <span class="hljs-comment">// 成功</span><br>            error -&gt; System.err.println(<span class="hljs-string">&quot;Error: &quot;</span> + error),           <span class="hljs-comment">// 錯誤</span><br>            () -&gt; System.out.println(<span class="hljs-string">&quot;Completed&quot;</span>)                    <span class="hljs-comment">// 完成</span><br>        );<br><br>        System.out.println(<span class="hljs-string">&quot;Request sent, non-blocking.&quot;</span>);<br><br>        <span class="hljs-comment">// 為了保證主線程不會提前結束，讓訂閱有時間執行</span><br>        <span class="hljs-keyword">try</span> &#123;<br>            Thread.sleep(<span class="hljs-number">5000</span>);  <span class="hljs-comment">// 模擬主線程等待一段時間</span><br>        &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// 定義請求體的類</span><br>    <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PostRequestBody</span> &#123;<br>        <span class="hljs-keyword">private</span> String title;<br>        <span class="hljs-keyword">private</span> String body;<br><br>        <span class="hljs-keyword">public</span> <span class="hljs-title function_">PostRequestBody</span><span class="hljs-params">(String title, String body)</span> &#123;<br>            <span class="hljs-built_in">this</span>.title = title;<br>            <span class="hljs-built_in">this</span>.body = body;<br>        &#125;<br><br>        <span class="hljs-comment">// Getter 和 Setter 方法</span><br>        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getTitle</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> title;<br>        &#125;<br><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setTitle</span><span class="hljs-params">(String title)</span> &#123;<br>            <span class="hljs-built_in">this</span>.title = title;<br>        &#125;<br><br>        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getBody</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> body;<br>        &#125;<br><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setBody</span><span class="hljs-params">(String body)</span> &#123;<br>            <span class="hljs-built_in">this</span>.body = body;<br>        &#125;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/Spring_WebFlux_&_WebClient/bbe45354-bcd7-4cba-9c36-da25973f3749.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h1 id="單元測試範例代碼"><a href="#單元測試範例代碼" class="headerlink" title="單元測試範例代碼"></a>單元測試範例代碼</h1><p>使用 <code>Mockito</code> 來模擬 WebClient 的行為，這樣我們可以測試應用程序邏輯，而不依賴實際的 HTTP 請求，並驗證非同步請求的訂閱行為。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.BeforeEach;<br><span class="hljs-keyword">import</span> org.junit.jupiter.api.Test;<br><span class="hljs-keyword">import</span> org.mockito.InjectMocks;<br><span class="hljs-keyword">import</span> org.mockito.Mock;<br><span class="hljs-keyword">import</span> org.mockito.MockitoAnnotations;<br><span class="hljs-keyword">import</span> org.springframework.web.reactive.function.BodyInserters;<br><span class="hljs-keyword">import</span> org.springframework.web.reactive.function.client.WebClient;<br><span class="hljs-keyword">import</span> org.springframework.web.reactive.function.client.WebClient.ResponseSpec;<br><span class="hljs-keyword">import</span> org.springframework.web.reactive.function.client.WebClient.RequestBodySpec;<br><span class="hljs-keyword">import</span> org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;<br><span class="hljs-keyword">import</span> reactor.core.publisher.Mono;<br><br><span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.mockito.ArgumentMatchers.any;<br><span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.mockito.Mockito.*;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">WebClientPostSubscribeExampleTest</span> &#123;<br><br>    <span class="hljs-meta">@Mock</span><br>    <span class="hljs-keyword">private</span> WebClient mockWebClient;<br><br>    <span class="hljs-meta">@Mock</span><br>    <span class="hljs-keyword">private</span> WebClient.RequestBodyUriSpec mockRequestBodyUriSpec;<br><br>    <span class="hljs-meta">@Mock</span><br>    <span class="hljs-keyword">private</span> WebClient.RequestHeadersSpec mockRequestHeadersSpec;<br><br>    <span class="hljs-meta">@Mock</span><br>    <span class="hljs-keyword">private</span> WebClient.ResponseSpec mockResponseSpec;<br><br>    <span class="hljs-meta">@InjectMocks</span><br>    <span class="hljs-keyword">private</span> WebClientPostSubscribeExample webClientPostSubscribeExample;<br><br>    <span class="hljs-meta">@BeforeEach</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setUp</span><span class="hljs-params">()</span> &#123;<br>        MockitoAnnotations.openMocks(<span class="hljs-built_in">this</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">testWebClientPostRequest</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-comment">// 準備模擬行為</span><br>        Mono&lt;String&gt; mockResponseMono = Mono.just(<span class="hljs-string">&quot;Mock Response&quot;</span>);<br><br>        <span class="hljs-comment">// 模擬 WebClient 行為鏈</span><br>        when(mockWebClient.post()).thenReturn(mockRequestBodyUriSpec);<br>        when(mockRequestBodyUriSpec.uri(<span class="hljs-string">&quot;/posts&quot;</span>)).thenReturn(mockRequestBodyUriSpec);<br>        when(mockRequestBodyUriSpec.bodyValue(any(PostRequestBody.class))).thenReturn(mockRequestHeadersSpec);<br>        when(mockRequestHeadersSpec.retrieve()).thenReturn(mockResponseSpec);<br>        when(mockResponseSpec.bodyToMono(String.class)).thenReturn(mockResponseMono);<br><br>        <span class="hljs-comment">// 調用測試邏輯</span><br>        <span class="hljs-type">PostRequestBody</span> <span class="hljs-variable">requestBody</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PostRequestBody</span>(<span class="hljs-string">&quot;foo&quot;</span>, <span class="hljs-string">&quot;bar&quot;</span>);<br>        Mono&lt;String&gt; responseMono = mockWebClient.post()<br>                .uri(<span class="hljs-string">&quot;/posts&quot;</span>)<br>                .bodyValue(requestBody)<br>                .retrieve()<br>                .bodyToMono(String.class);<br><br>        <span class="hljs-comment">// 非阻塞地處理response</span><br>        responseMono.subscribe(<br>                response -&gt; System.out.println(<span class="hljs-string">&quot;Response: &quot;</span> + response),  <span class="hljs-comment">// 成功</span><br>                error -&gt; System.err.println(<span class="hljs-string">&quot;Error: &quot;</span> + error),           <span class="hljs-comment">// 錯誤</span><br>                () -&gt; System.out.println(<span class="hljs-string">&quot;Completed&quot;</span>)                    <span class="hljs-comment">// 完成</span><br>        );<br><br>        <span class="hljs-comment">// 驗證 WebClient 的方法是否按預期調用</span><br>        verify(mockWebClient, times(<span class="hljs-number">1</span>)).post();<br>        verify(mockRequestBodyUriSpec, times(<span class="hljs-number">1</span>)).uri(<span class="hljs-string">&quot;/posts&quot;</span>);<br>        verify(mockRequestBodyUriSpec, times(<span class="hljs-number">1</span>)).bodyValue(any(PostRequestBody.class));<br>        verify(mockRequestHeadersSpec, times(<span class="hljs-number">1</span>)).retrieve();<br>        verify(mockResponseSpec, times(<span class="hljs-number">1</span>)).bodyToMono(String.class);<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Spring-WebFlux/" class="print-no-link">#Spring WebFlux</a>
+      
+        <a href="/tags/Spring-MVC/" class="print-no-link">#Spring MVC</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Spring WebFlux &amp; WebClient</div>
+      <div>https://nero811.github.io/2024/10/10/Spring WebFlux &amp; WebClient/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Jack Yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>發布於</div>
+          <div>2024年10月10日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>許可協議</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/10/03/%E8%87%AA%E8%A8%82%E7%BE%A9servlet%20filter/" title="自訂義servlet filter">
+                        <span class="hidden-mobile">自訂義servlet filter</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目錄</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜尋</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">關鍵字</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="mailto:jy811005@gmail.com" target="_blank" rel="nofollow noopener"><span>Produced by Jack Yang ©</span></a> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允許 JavaScript 運行的環境下瀏覽效果更佳</div>
+  </noscript>
+</body>
+</html>
