@@ -1,0 +1,715 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-TW" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icons8-code-48.png">
+  <link rel="icon" href="/img/icons8-code-48.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Jack Yang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言本篇以Keycloak作為Authorizaion Server，詳細解說每一段OIDC Authorization Code Flow。 架構Resorce Owner → localhost:8082 Spring Security → localhost:8081 Keycloak Server → localhost:8080  OAuth 2.0 + OIDC Authorizati">
+<meta property="og:type" content="article">
+<meta property="og:title" content="詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟">
+<meta property="og:url" content="https://nero811.github.io/2024/10/15/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth%202.0%20+%20OIDC%20Authorization%20Code%20Flow%20%E6%AD%A5%E9%A9%9F/index.html">
+<meta property="og:site_name" content="Jack的後端工程師筆記">
+<meta property="og:description" content="前言本篇以Keycloak作為Authorizaion Server，詳細解說每一段OIDC Authorization Code Flow。 架構Resorce Owner → localhost:8082 Spring Security → localhost:8081 Keycloak Server → localhost:8080  OAuth 2.0 + OIDC Authorizati">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/120e09e7-188c-806c-a9ed-e0a0fa19a24b.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807f-9596-dd4922bbff59.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-806f-9b4e-fbea9b7727c2.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-80bd-aeda-df1bb2af4455.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-809b-8431-e16f7ec9d931.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807f-995f-c0d64ca073a8.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-803b-85fb-e2d28a5c55d9.webp">
+<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807c-8708-fc6db46c9b3d.webp">
+<meta property="article:published_time" content="2024-10-15T14:32:59.022Z">
+<meta property="article:modified_time" content="2024-10-15T14:33:51.734Z">
+<meta property="article:author" content="Jack Yang">
+<meta property="article:tag" content="Spring Security">
+<meta property="article:tag" content="Keyclaok">
+<meta property="article:tag" content="OAuth2.0">
+<meta property="article:tag" content="OIDC">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/120e09e7-188c-806c-a9ed-e0a0fa19a24b.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟 - Jack的後端工程師筆記</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"nero811.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":["home"]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Coding Is Life</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首頁</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>歸檔</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分類</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>標籤</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>關於</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/undraw_Programming_re_kg9v.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-10-15 22:32" pubdate>
+          2024年10月15日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          463 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          4 分鐘
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本篇以Keycloak作為Authorizaion Server，詳細解說每一段OIDC Authorization Code Flow。</p>
+<h1 id="架構"><a href="#架構" class="headerlink" title="架構"></a>架構</h1><p>Resorce Owner → localhost:8082</p>
+<p>Spring Security → localhost:8081</p>
+<p>Keycloak Server → localhost:8080</p>
+<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/120e09e7-188c-806c-a9ed-e0a0fa19a24b.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h1 id="OAuth-2-0-OIDC-Authorization-Code-Flow-步驟："><a href="#OAuth-2-0-OIDC-Authorization-Code-Flow-步驟：" class="headerlink" title="OAuth 2.0 + OIDC Authorization Code Flow 步驟："></a>OAuth 2.0 + OIDC Authorization Code Flow 步驟：</h1><h2 id="Resource-Owner-訪問-Spring-Security-微服務"><a href="#Resource-Owner-訪問-Spring-Security-微服務" class="headerlink" title="Resource Owner 訪問 Spring Security 微服務"></a>Resource Owner 訪問 Spring Security 微服務</h2><p>Resource Owner 請求一個受保護的資源（API 或頁面）。Spring Security 微服務檢查當前請求是否包含有效的授權資訊（例如 Access Token 或 Session）。如果沒有，則需要進行認證。</p>
+<h2 id="Spring-Security-發起-302-Redirect"><a href="#Spring-Security-發起-302-Redirect" class="headerlink" title="Spring Security 發起 302 Redirect"></a>Spring Security 發起 302 Redirect</h2><p>Spring Security 微服務偵測到沒有授權，將 Resource Owner 重定向到 Keycloak 進行認證，透過 Spring Security 的 OAuth 2.0 設定進行，通常是：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk"><br>http:<span class="hljs-regexp">//</span>&#123;CLIENT_URL&#125;:&#123;PORT&#125;<span class="hljs-regexp">/oauth2/</span>authorization/keycloak<br></code></pre></td></tr></table></figure>
+
+<p>這個 URL 會觸發重定向到 Keycloak 的授權端點。</p>
+<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807f-9596-dd4922bbff59.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="重導向到-Keycloak-授權端點-Authorization-Endpoint"><a href="#重導向到-Keycloak-授權端點-Authorization-Endpoint" class="headerlink" title="重導向到 Keycloak 授權端點 (Authorization Endpoint)"></a>重導向到 Keycloak 授權端點 (Authorization Endpoint)</h2><p>帶著 <code>client_id</code>、<code>scope=openid</code>（請求 OIDC）、<code>redirect_uri</code> 等參數，發起一個 302 Redirect 到 Keycloak 的授權端點：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk"><br>http:<span class="hljs-regexp">//</span>&#123;KEYCLOAK_URL&#125;:&#123;PORT&#125;<span class="hljs-regexp">/realms/</span>&#123;realm_id&#125;<span class="hljs-regexp">/protocol/</span>openid-connect/auth?<br></code></pre></td></tr></table></figure>
+
+<p>這裡 Spring Security 發起 OAuth 2.0 授權請求，要求 OIDC 認證。</p>
+<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-806f-9b4e-fbea9b7727c2.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>此時雖然會出現登入畫面給Resource Owner輸入帳號密碼，但實際上Keycloak會在後台將使用者資訊帶到下一個用戶認證 (Login Actions Authenticate)才真正進行認證。</p>
+<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-80bd-aeda-df1bb2af4455.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="Keycloak-用戶認證-Login-Actions-Authenticate"><a href="#Keycloak-用戶認證-Login-Actions-Authenticate" class="headerlink" title="Keycloak 用戶認證 (Login Actions Authenticate)"></a>Keycloak 用戶認證 (Login Actions Authenticate)</h2><p>Keycloak 在這個端點進行身分驗證（如帳號密碼、憑證）。</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk"><br>http:<span class="hljs-regexp">//</span>&#123;KEYCLOAK_URL&#125;:&#123;PORT&#125;<span class="hljs-regexp">/realms/</span>&#123;realm_id&#125;<span class="hljs-regexp">/login-actions/</span>authenticate?<br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-809b-8431-e16f7ec9d931.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807f-995f-c0d64ca073a8.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="Keycloak-發回-Authorization-Code"><a href="#Keycloak-發回-Authorization-Code" class="headerlink" title="Keycloak 發回 Authorization Code"></a>Keycloak 發回 Authorization Code</h2><p>認證成功後，Keycloak 會生成一個 Authorization Code，並帶著 <code>code</code> 和 <code>state</code> 參數發起 302 Redirect，將 Resource Owner 重定向回 <code>redirect_uri</code>（Spring Security 微服務的端點）：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk"><br>http:<span class="hljs-regexp">//</span>&#123;CLIENT_URL&#125;:&#123;PORT&#125;<span class="hljs-regexp">/login/</span>oauth2<span class="hljs-regexp">/code/</span>keycloak<br></code></pre></td></tr></table></figure>
+
+<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-803b-85fb-e2d28a5c55d9.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h2 id="Spring-Security-微服務換取-Token"><a href="#Spring-Security-微服務換取-Token" class="headerlink" title="Spring Security 微服務換取 Token"></a>Spring Security 微服務換取 Token</h2><p>Spring Security 微服務在收到 Authorization Code 後，會攜帶這個 <code>code</code>、<code>client_id</code>、<code>client_secret</code> 發送 POST 請求到 Keycloak 的 Token Endpoint 以換取 Access Token、ID Token 和 Refresh Token。</p>
+<p>端點：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk"><br>http:<span class="hljs-regexp">//</span>&#123;KEYCLOAK_URL&#125;:&#123;PORT&#125;<span class="hljs-regexp">/realms/</span>&#123;realm_id&#125;<span class="hljs-regexp">/protocol/</span>openid-connect/token<br></code></pre></td></tr></table></figure>
+
+<h2 id="Keycloak-返回-Tokens"><a href="#Keycloak-返回-Tokens" class="headerlink" title="Keycloak 返回 Tokens"></a>Keycloak 返回 Tokens</h2><p>Keycloak 驗證請求後，返回 Access Token、ID Token 和可選的 Refresh Token 給 Spring Security 微服務。</p>
+<h2 id="Spring-Security-微服務處理-Token，創建Session"><a href="#Spring-Security-微服務處理-Token，創建Session" class="headerlink" title="Spring Security 微服務處理 Token，創建Session"></a>Spring Security 微服務處理 Token，創建Session</h2><p>Spring Security 接收並處理這些 Tokens，將它們與 Resource Owner 綁定，並可能生成 JSessionID（如果使用Session管理），將 Resource Owner 重定向到原始請求的受保護資源。</p>
+<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807c-8708-fc6db46c9b3d.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Spring-Security/" class="print-no-link">#Spring Security</a>
+      
+        <a href="/tags/Keyclaok/" class="print-no-link">#Keyclaok</a>
+      
+        <a href="/tags/OAuth2-0/" class="print-no-link">#OAuth2.0</a>
+      
+        <a href="/tags/OIDC/" class="print-no-link">#OIDC</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟</div>
+      <div>https://nero811.github.io/2024/10/15/詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Jack Yang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>發布於</div>
+          <div>2024年10月15日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>許可協議</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/10/13/%E4%BD%BF%E7%94%A8AtomicBoolean%E5%AE%89%E5%85%A8%E7%9A%84%E5%9F%B7%E8%A1%8C%E5%A4%9A%E5%9F%B7%E8%A1%8C%E7%B7%92/" title="使用AtomicBoolean安全的執行多執行緒">
+                        <span class="hidden-mobile">使用AtomicBoolean安全的執行多執行緒</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目錄</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜尋</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">關鍵字</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="mailto:jy811005@gmail.com" target="_blank" rel="nofollow noopener"><span>Produced by Jack Yang ©</span></a> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允許 JavaScript 運行的環境下瀏覽效果更佳</div>
+  </noscript>
+</body>
+</html>
