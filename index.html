@@ -1,1028 +1,1031 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-TW" data-default-color-scheme=auto>
+<html lang="zh-TW" data-default-color-scheme="auto">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-35HZKLK22N"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
+      gtag("config", "G-35HZKLK22N");
+    </script>
+    <meta charset="UTF-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/img/icons8-code-48.png" />
+    <link rel="icon" href="/img/icons8-code-48.png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no"
+    />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
 
+    <meta name="theme-color" content="#2f4154" />
+    <meta name="author" content="Jack Yang" />
+    <meta name="keywords" content="" />
 
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/icons8-code-48.png">
-  <link rel="icon" href="/img/icons8-code-48.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="Jack Yang">
-  <meta name="keywords" content="">
-  
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Jack的後端工程師筆記">
-<meta property="og:url" content="https://nero811.github.io/index.html">
-<meta property="og:site_name" content="Jack的後端工程師筆記">
-<meta property="og:locale" content="zh_TW">
-<meta property="article:author" content="Jack Yang">
-<meta name="twitter:card" content="summary_large_image">
-  
-  
-    <meta name="referrer" content="no-referrer-when-downgrade">
-  
-  
-  <title>Jack的後端工程師筆記</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Jack的後端工程師筆記" />
+    <meta property="og:url" content="https://nero811.github.io/index.html" />
+    <meta property="og:site_name" content="Jack的後端工程師筆記" />
+    <meta property="og:locale" content="zh_TW" />
+    <meta property="article:author" content="Jack Yang" />
+    <meta name="twitter:card" content="summary_large_image" />
 
-  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
 
+    <title>Jack的後端工程師筆記</title>
 
+    <link
+      rel="stylesheet"
+      href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css"
+    />
 
+    <!-- 主题依赖的图标库，不要自行修改 -->
+    <!-- Do not modify the link that theme dependent icons -->
 
+    <link
+      rel="stylesheet"
+      href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css"
+    />
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<!-- Do not modify the link that theme dependent icons -->
+    <link
+      rel="stylesheet"
+      href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css"
+    />
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+    <link rel="stylesheet" href="/css/main.css" />
 
+    <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
 
+    <link
+      id="highlight-css-dark"
+      rel="stylesheet"
+      href="/css/highlight-dark.css"
+    />
 
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+    <script id="fluid-configs">
+      var Fluid = window.Fluid || {};
+      Fluid.ctx = Object.assign({}, Fluid.ctx);
+      var CONFIG = {
+        hostname: "nero811.github.io",
+        root: "/",
+        version: "1.9.7",
+        typing: {
+          enable: true,
+          typeSpeed: 70,
+          cursorChar: "_",
+          loop: false,
+          scope: ["home"],
+        },
+        anchorjs: {
+          enable: true,
+          element: "h1,h2,h3,h4,h5,h6",
+          placement: "left",
+          visible: "hover",
+          icon: "",
+        },
+        progressbar: {
+          enable: true,
+          height_px: 3,
+          color: "#29d",
+          options: { showSpinner: false, trickleSpeed: 100 },
+        },
+        code_language: { enable: true, default: "TEXT" },
+        copy_btn: true,
+        image_caption: { enable: true },
+        image_zoom: { enable: true, img_url_replace: ["", ""] },
+        toc: {
+          enable: true,
+          placement: "right",
+          headingSelector: "h1,h2,h3,h4,h5,h6",
+          collapseDepth: 0,
+        },
+        lazyload: {
+          enable: true,
+          loading_img: "/img/loading.gif",
+          onlypost: false,
+          offset_factor: 2,
+        },
+        web_analytics: {
+          enable: true,
+          follow_dnt: false,
+          baidu: null,
+          google: { measurement_id: null },
+          tencent: { sid: null, cid: null },
+          woyaola: null,
+          cnzz: null,
+          leancloud: {
+            app_id: null,
+            app_key: null,
+            server_url: null,
+            path: "window.location.pathname",
+            ignore_local: false,
+          },
+        },
+        search_path: "/local-search.xml",
+        include_content_in_search: true,
+      };
 
+      if (CONFIG.web_analytics.follow_dnt) {
+        var dntVal =
+          navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+        Fluid.ctx.dnt =
+          dntVal &&
+          (dntVal.startsWith("1") ||
+            dntVal.startsWith("yes") ||
+            dntVal.startsWith("on"));
+      }
+    </script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/color-schema.js"></script>
 
-<link  rel="stylesheet" href="/css/main.css" />
-
-
-  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
-  
-    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
-  
-
-
-
-
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"nero811.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":["home"]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":false,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
-
-    if (CONFIG.web_analytics.follow_dnt) {
-      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
-      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
-    }
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-  
-
-  
-
-  
     <!-- Google tag (gtag.js) -->
     <script async>
       if (!Fluid.ctx.dnt) {
-        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
-          window.dataLayer = window.dataLayer || [];
-          function gtag() {
-            dataLayer.push(arguments);
+        Fluid.utils.createScript(
+          "https://www.googletagmanager.com/gtag/js?id=",
+          function () {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
+            gtag("config", "");
           }
-          gtag('js', new Date());
-          gtag('config', '');
-        });
+        );
       }
     </script>
-  
 
-  
+    <meta name="generator" content="Hexo 7.3.0" />
+  </head>
 
-  
-
-  
-
-  
-
-
-
-  
-<meta name="generator" content="Hexo 7.3.0"></head>
-
-
-<body>
-  
-
-  <header>
-    
-
-<div class="header-inner" style="height: 100vh;">
-  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand" href="/">
-      <strong>Coding Is Life</strong>
-    </a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/" target="_self">
-                <i class="iconfont icon-home-fill"></i>
-                <span>首頁</span>
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/" target="_self">
-                <i class="iconfont icon-archive-fill"></i>
-                <span>歸檔</span>
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/" target="_self">
-                <i class="iconfont icon-category-fill"></i>
-                <span>分類</span>
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/" target="_self">
-                <i class="iconfont icon-tags-fill"></i>
-                <span>標籤</span>
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/" target="_self">
-                <i class="iconfont icon-user-fill"></i>
-                <span>關於</span>
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
-              <i class="iconfont icon-search"></i>
-            </a>
-          </li>
-          
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
-              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
-            </a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-  
-
-<div id="banner" class="banner" parallax=true
-     style="background: url('/img/pexels-goumbik-574071.jpg') no-repeat center center; background-size: cover;">
-  <div class="full-bg-img">
-    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-      <div class="banner-text text-center fade-in-up">
-        <div class="h2">
-          
-            <span id="subtitle" data-typed-text="行之苟有恆，久久自芬芳"></span>
-          
-        </div>
-
-        
-      </div>
-
-      
-        <div class="scroll-down-bar">
-          <i class="iconfont icon-arrowdown"></i>
-        </div>
-      
-    </div>
-  </div>
-</div>
-
-</div>
-
-  </header>
-
-  <main>
-    
-      <div class="container nopadding-x-md">
-        <div id="board"
-          style="margin-top: 0">
-          
+  <body>
+    <header>
+      <div class="header-inner" style="height: 100vh">
+        <nav
+          id="navbar"
+          class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"
+        >
           <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
-                
+            <a class="navbar-brand" href="/">
+              <strong>Coding Is Life</strong>
+            </a>
 
+            <button
+              id="navbar-toggler-btn"
+              class="navbar-toggler"
+              type="button"
+              data-toggle="collapse"
+              data-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <div class="animated-icon">
+                <span></span><span></span><span></span>
+              </div>
+            </button>
 
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/10/15/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth%202.0%20+%20OIDC%20Authorization%20Code%20Flow%20%E6%AD%A5%E9%A9%9F/" target="_self">
-          詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟
-        </a>
-      </h2>
+            <!-- Collapsible content -->
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav ml-auto text-center">
+                <li class="nav-item">
+                  <a class="nav-link" href="/" target="_self">
+                    <i class="iconfont icon-home-fill"></i>
+                    <span>首頁</span>
+                  </a>
+                </li>
 
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/15/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth%202.0%20+%20OIDC%20Authorization%20Code%20Flow%20%E6%AD%A5%E9%A9%9F/" target="_self">
-        <div>
-          前言本篇以Keycloak作為Authorizaion Server，詳細解說每一段OIDC Authorization Code Flow。 架構Resorce Owner → localhost:8082 Spring Security → localhost:8081 Keycloak Server → localhost:8080  OAuth 2.0 + OIDC Authorizati
-        </div>
-      </a>
+                <li class="nav-item">
+                  <a class="nav-link" href="/archives/" target="_self">
+                    <i class="iconfont icon-archive-fill"></i>
+                    <span>歸檔</span>
+                  </a>
+                </li>
 
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-10-15 22:32" pubdate>
-              2024-10-15
-            </time>
+                <li class="nav-item">
+                  <a class="nav-link" href="/categories/" target="_self">
+                    <i class="iconfont icon-category-fill"></i>
+                    <span>分類</span>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="/tags/" target="_self">
+                    <i class="iconfont icon-tags-fill"></i>
+                    <span>標籤</span>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="/about/" target="_self">
+                    <i class="iconfont icon-user-fill"></i>
+                    <span>關於</span>
+                  </a>
+                </li>
+
+                <li class="nav-item" id="search-btn">
+                  <a
+                    class="nav-link"
+                    target="_self"
+                    href="javascript:;"
+                    data-toggle="modal"
+                    data-target="#modalSearch"
+                    aria-label="Search"
+                  >
+                    <i class="iconfont icon-search"></i>
+                  </a>
+                </li>
+
+                <li class="nav-item" id="color-toggle-btn">
+                  <a
+                    class="nav-link"
+                    target="_self"
+                    href="javascript:;"
+                    aria-label="Color Toggle"
+                  >
+                    <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
+        </nav>
 
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
-  
-  
+        <div
+          id="banner"
+          class="banner"
+          parallax="true"
+          style="
+            background: url('/img/pexels-goumbik-574071.jpg') no-repeat center
+              center;
+            background-size: cover;
+          "
+        >
+          <div class="full-bg-img">
+            <div
+              class="mask flex-center"
+              style="background-color: rgba(0, 0, 0, 0.3)"
+            >
+              <div class="banner-text text-center fade-in-up">
+                <div class="h2">
+                  <span
+                    id="subtitle"
+                    data-typed-text="行之苟有恆，久久自芬芳"
+                  ></span>
+                </div>
+              </div>
 
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Spring-Security/">#Spring Security</a>
-            
-              <a href="/tags/Keyclaok/">#Keyclaok</a>
-            
-              <a href="/tags/OAuth2-0/">#OAuth2.0</a>
-            
-              <a href="/tags/OIDC/">#OIDC</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/10/13/%E4%BD%BF%E7%94%A8AtomicBoolean%E5%AE%89%E5%85%A8%E7%9A%84%E5%9F%B7%E8%A1%8C%E5%A4%9A%E5%9F%B7%E8%A1%8C%E7%B7%92/" target="_self">
-          使用AtomicBoolean安全的執行多執行緒
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/13/%E4%BD%BF%E7%94%A8AtomicBoolean%E5%AE%89%E5%85%A8%E7%9A%84%E5%9F%B7%E8%A1%8C%E5%A4%9A%E5%9F%B7%E8%A1%8C%E7%B7%92/" target="_self">
-        <div>
-          前言AtomicBoolean 是 Java 中位於 java.util.concurrent.atomic 庫下的一個class，專門用於處理多執行緒環境下的布林值操作。與普通的 boolean 變數不同，AtomicBoolean 提供了原子操作，這意味著它可以確保在並發情況下對布林值的修改是線程安全的，確保不會有多個執行緒同時啟動同一個任務。 本篇我們將實作一個Spring Boot程式，使
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-10-13 23:23" pubdate>
-              2024-10-13
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Spring-MVC/">#Spring MVC</a>
-            
-              <a href="/tags/Multithreaded-Programming/">#Multithreaded Programming</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/10/10/Spring%20WebFlux%20&amp;%20WebClient/" target="_self">
-          Spring WebFlux &amp; WebClient
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/10/Spring%20WebFlux%20&amp;%20WebClient/" target="_self">
-        <div>
-          前言在 Spring 中，WebClient 和 RestTemplate 是兩個常見的 HTTP 客戶端工具。隨著 Spring 5 (Spring Boot 2.0.0)的引入，WebClient 成為了建議使用的非同步 HTTP 客戶端工具，而 RestTemplate 則是傳統的同步 HTTP 客戶端。 本篇將介紹WebClient ，以及比較WebClient 、 RestTemplat
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-10-10 17:47" pubdate>
-              2024-10-10
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Spring-WebFlux/">#Spring WebFlux</a>
-            
-              <a href="/tags/Spring-MVC/">#Spring MVC</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/10/03/%E8%87%AA%E8%A8%82%E7%BE%A9servlet%20filter/" target="_self">
-          自訂義servlet filter
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/03/%E8%87%AA%E8%A8%82%E7%BE%A9servlet%20filter/" target="_self">
-        <div>
-          前言開發者在實務上難免會接觸到維運，而維運時一定會仰賴Log。在MVC架構下，想在服務獲得Http Request和回應給Client端Http Response時打印Log，若是土法煉鋼將Log寫在每個controller下，將會寫非常多的Code，在controller很多的情況下也很難管理。 本篇將透過覆寫servlet filter的方式，自訂義一個filter chain打印Http R
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-10-03 21:31" pubdate>
-              2024-10-03
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Spring-Boot/">#Spring Boot</a>
-            
-              <a href="/tags/MainTain/">#MainTain</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/09/30/%E4%BD%BF%E7%94%A8AWX%20%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/" target="_self">
-          使用AWX 於K8S中部署服務
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/09/30/%E4%BD%BF%E7%94%A8AWX%20%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/" target="_self">
-        <div>
-          前言AWX的PlayBook功能非常強大，可以與多種服務、平台和基礎設施進行互動。 例如:  雲提供商：AWX 可以與 AWS、Azure、Google Cloud 等雲服務平台進行互動，支持虛擬機實例的創建、網絡設置、負載均衡器配置等操作。  容器編排工具：AWX 與 Kubernetes、OpenShift 等平台集成良好，能自動化容器應用的部署、升級和管理。  版本控制系統：AWX 可以與
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-09-30 23:07" pubdate>
-              2024-09-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Ansible/" class="category-chain-item">Ansible</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/AWX/">#AWX</a>
-            
-              <a href="/tags/K8S/">#K8S</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/09/29/Spring%20Cache/" target="_self">
-          Spring Cache
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/09/29/Spring%20Cache/" target="_self">
-        <div>
-          前言我們平常在專案中查找資料往往都是直接訪問資料庫,但現今資料的量越來越大,訪問的次數及時間過於頻繁,這樣會對我們的資料庫帶來很大的負擔及效能上的問題,為了解決這個狀況,這邊採用Spring Cache 整合Redis來實現。本文將透過簡單的實作，展示springBoot結合Redis並且實現快取。 需要的依賴與設定Dependency12345&lt;dependency&gt;    &lt;
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-09-29 23:18" pubdate>
-              2024-09-29
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Spring-Boot/">#Spring Boot</a>
-            
-              <a href="/tags/Spring-Cache/">#Spring Cache</a>
-            
-              <a href="/tags/Redis/">#Redis</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/26/Ansible%20AWX%20RestAPI/" target="_self">
-          Ansible AWX RestAPI
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/26/Ansible%20AWX%20RestAPI/" target="_self">
-        <div>
-          前言AWX提供了RestAPI給開發者使用，開發者可以使用RestAPI開發更客製化的功能。AWX可以玩的API有非常多，這邊介紹筆者工作上用到的幾個API，並實作使用Spring Boot程式串接AWX RestAPI去啟動一個playbook。 更多api資訊可參考官方文件: https://ansible.readthedocs.io/projects/awx/en/latest/rest_
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-26 16:25" pubdate>
-              2024-08-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Ansible/" class="category-chain-item">Ansible</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/AWX/">#AWX</a>
-            
-              <a href="/tags/K8S/">#K8S</a>
-            
-              <a href="/tags/RestAPI/">#RestAPI</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/18/%E5%AF%A6%E7%8F%BEToken%20Based%E7%9A%84Single%20Sign%20On(SSO)/" target="_self">
-          實現Token Based的Single Sign On(SSO)
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/18/%E5%AF%A6%E7%8F%BEToken%20Based%E7%9A%84Single%20Sign%20On(SSO)/" target="_self">
-        <div>
-          前言在之前我們已經實現過使用Session Based的SSO，本篇我們來實作使用Token Based的SSO 架構圖 說明: Web Client向Keycloak end-point &#123;&#123;server&#125;&#125;/realms/&#123;&#123;realm&#125;&#125;/protocol/openid-connect/token獲取access
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-18 21:58" pubdate>
-              2024-08-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Spring-Boot/">#Spring Boot</a>
-            
-              <a href="/tags/Spring-Security/">#Spring Security</a>
-            
-              <a href="/tags/Keyclaok/">#Keyclaok</a>
-            
-              <a href="/tags/OAuth2-0/">#OAuth2.0</a>
-            
-              <a href="/tags/OIDC/">#OIDC</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/12/Spring-Session%20With%20Redis%20%E9%81%94%E5%88%B0Session%20%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/" target="_self">
-          Spring-Session With Redis 達到Session 集中式處理
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/12/Spring-Session%20With%20Redis%20%E9%81%94%E5%88%B0Session%20%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/" target="_self">
-        <div>
-          前言:我們都知道session是放在application端，當application 中斷&#x2F;重啟時或是browser關閉&#x2F;登出時，session就會消失。筆者工作上是使用Keycloak做為Authenticaion server，並採取以下常見的架構。  由於Nginx預設附載平衡機制是使用(round robin)，會導致一種情境: 當使用者透過Tomcat 1登入Ser
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-12 22:29" pubdate>
-              2024-08-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Spring-Boot/">#Spring Boot</a>
-            
-              <a href="/tags/Spring-Security/">#Spring Security</a>
-            
-              <a href="/tags/Spring-Redis-Session/">#Spring Redis Session</a>
-            
-              <a href="/tags/Keyclaok/">#Keyclaok</a>
-            
-              <a href="/tags/OAuth2-0/">#OAuth2.0</a>
-            
-              <a href="/tags/OIDC/">#OIDC</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/07/Minikube%E9%83%A8%E5%B1%ACAnsible%20AWX/" target="_self">
-          Minikube部屬Ansible AWX
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/07/Minikube%E9%83%A8%E5%B1%ACAnsible%20AWX/" target="_self">
-        <div>
-          前言繼上一篇我們部屬完Minikube後，本篇目標接著部屬Ansible AWX到Minikube，並且透過Ansible AWX API來啟動template 安裝Ansible AWX 安裝helm&amp;設定環境變數  1curl https://get.helm.sh/helm-v3.10.2-windows-amd64.tar.gz   依序執行以下指令  12helm repo ad
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-07 23:40" pubdate>
-              2024-08-07
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Ansible/" class="category-chain-item">Ansible</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/AWX/">#AWX</a>
-            
-              <a href="/tags/K8S/">#K8S</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-
-
-  <nav aria-label="navigation">
-    <span class="pagination" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
-    </span>
-  </nav>
-
-
-
+              <div class="scroll-down-bar">
+                <i class="iconfont icon-arrowdown"></i>
               </div>
             </div>
           </div>
         </div>
       </div>
-    
+    </header>
 
-    
+    <main>
+      <div class="container nopadding-x-md">
+        <div id="board" style="margin-top: 0">
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                <div class="row mx-auto index-card">
+                  <article class="col-12 col-md-12 mx-auto index-info">
+                    <h2 class="index-header">
+                      <a
+                        href="/2024/10/15/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth%202.0%20+%20OIDC%20Authorization%20Code%20Flow%20%E6%AD%A5%E9%A9%9F/"
+                        target="_self"
+                      >
+                        詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟
+                      </a>
+                    </h2>
+
+                    <a
+                      class="index-excerpt index-excerpt__noimg"
+                      href="/2024/10/15/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth%202.0%20+%20OIDC%20Authorization%20Code%20Flow%20%E6%AD%A5%E9%A9%9F/"
+                      target="_self"
+                    >
+                      <div>
+                        前言本篇以Keycloak作為Authorizaion
+                        Server，詳細解說每一段OIDC Authorization Code Flow。
+                        架構Resorce Owner → localhost:8082 Spring Security →
+                        localhost:8081 Keycloak Server → localhost:8080 OAuth
+                        2.0 + OIDC Authorizati
+                      </div>
+                    </a>
+
+                    <div class="index-btm post-metas">
+                      <div class="post-meta mr-3">
+                        <i class="iconfont icon-date"></i>
+                        <time datetime="2024-10-15 22:32" pubdate>
+                          2024-10-15
+                        </time>
+                      </div>
+
+                      <div class="post-meta mr-3 d-flex align-items-center">
+                        <i class="iconfont icon-category"></i>
+
+                        <span class="category-chains">
+                          <span class="category-chain">
+                            <a
+                              href="/categories/Spring/"
+                              class="category-chain-item"
+                              >Spring</a
+                            >
+                          </span>
+                        </span>
+                      </div>
+
+                      <div class="post-meta">
+                        <i class="iconfont icon-tags"></i>
+
+                        <a href="/tags/Spring-Security/">#Spring Security</a>
+
+                        <a href="/tags/Keyclaok/">#Keyclaok</a>
+
+                        <a href="/tags/OAuth2-0/">#OAuth2.0</a>
+
+                        <a href="/tags/OIDC/">#OIDC</a>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="row mx-auto index-card">
+                  <article class="col-12 col-md-12 mx-auto index-info">
+                    <h2 class="index-header">
+                      <a
+                        href="/2024/10/13/%E4%BD%BF%E7%94%A8AtomicBoolean%E5%AE%89%E5%85%A8%E7%9A%84%E5%9F%B7%E8%A1%8C%E5%A4%9A%E5%9F%B7%E8%A1%8C%E7%B7%92/"
+                        target="_self"
+                      >
+                        使用AtomicBoolean安全的執行多執行緒
+                      </a>
+                    </h2>
+
+                    <a
+                      class="index-excerpt index-excerpt__noimg"
+                      href="/2024/10/13/%E4%BD%BF%E7%94%A8AtomicBoolean%E5%AE%89%E5%85%A8%E7%9A%84%E5%9F%B7%E8%A1%8C%E5%A4%9A%E5%9F%B7%E8%A1%8C%E7%B7%92/"
+                      target="_self"
+                    >
+                      <div>
+                        前言AtomicBoolean 是 Java 中位於
+                        java.util.concurrent.atomic
+                        庫下的一個class，專門用於處理多執行緒環境下的布林值操作。與普通的
+                        boolean 變數不同，AtomicBoolean
+                        提供了原子操作，這意味著它可以確保在並發情況下對布林值的修改是線程安全的，確保不會有多個執行緒同時啟動同一個任務。
+                        本篇我們將實作一個Spring Boot程式，使
+                      </div>
+                    </a>
+
+                    <div class="index-btm post-metas">
+                      <div class="post-meta mr-3">
+                        <i class="iconfont icon-date"></i>
+                        <time datetime="2024-10-13 23:23" pubdate>
+                          2024-10-13
+                        </time>
+                      </div>
+
+                      <div class="post-meta mr-3 d-flex align-items-center">
+                        <i class="iconfont icon-category"></i>
+
+                        <span class="category-chains">
+                          <span class="category-chain">
+                            <a
+                              href="/categories/Spring/"
+                              class="category-chain-item"
+                              >Spring</a
+                            >
+                          </span>
+                        </span>
+                      </div>
+
+                      <div class="post-meta">
+                        <i class="iconfont icon-tags"></i>
+
+                        <a href="/tags/Spring-MVC/">#Spring MVC</a>
+
+                        <a href="/tags/Multithreaded-Programming/"
+                          >#Multithreaded Programming</a
+                        >
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="row mx-auto index-card">
+                  <article class="col-12 col-md-12 mx-auto index-info">
+                    <h2 class="index-header">
+                      <a
+                        href="/2024/10/10/Spring%20WebFlux%20&amp;%20WebClient/"
+                        target="_self"
+                      >
+                        Spring WebFlux &amp; WebClient
+                      </a>
+                    </h2>
+
+                    <a
+                      class="index-excerpt index-excerpt__noimg"
+                      href="/2024/10/10/Spring%20WebFlux%20&amp;%20WebClient/"
+                      target="_self"
+                    >
+                      <div>
+                        前言在 Spring 中，WebClient 和 RestTemplate 是兩個常見的
+                        HTTP 客戶端工具。隨著 Spring 5 (Spring Boot
+                        2.0.0)的引入，WebClient 成為了建議使用的非同步 HTTP
+                        客戶端工具，而 RestTemplate 則是傳統的同步 HTTP 客戶端。
+                        本篇將介紹WebClient ，以及比較WebClient 、 RestTemplat
+                      </div>
+                    </a>
+
+                    <div class="index-btm post-metas">
+                      <div class="post-meta mr-3">
+                        <i class="iconfont icon-date"></i>
+                        <time datetime="2024-10-10 17:47" pubdate>
+                          2024-10-10
+                        </time>
+                      </div>
+
+                      <div class="post-meta mr-3 d-flex align-items-center">
+                        <i class="iconfont icon-category"></i>
+
+                        <span class="category-chains">
+                          <span class="category-chain">
+                            <a
+                              href="/categories/Spring/"
+                              class="category-chain-item"
+                              >Spring</a
+                            >
+                          </span>
+                        </span>
+                      </div>
+
+                      <div class="post-meta">
+                        <i class="iconfont icon-tags"></i>
+
+                        <a href="/tags/Spring-WebFlux/">#Spring WebFlux</a>
+
+                        <a href="/tags/Spring-MVC/">#Spring MVC</a>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="row mx-auto index-card">
+                  <article class="col-12 col-md-12 mx-auto index-info">
+                    <h2 class="index-header">
+                      <a
+                        href="/2024/10/03/%E8%87%AA%E8%A8%82%E7%BE%A9servlet%20filter/"
+                        target="_self"
+                      >
+                        自訂義servlet filter
+                      </a>
+                    </h2>
+
+                    <a
+                      class="index-excerpt index-excerpt__noimg"
+                      href="/2024/10/03/%E8%87%AA%E8%A8%82%E7%BE%A9servlet%20filter/"
+                      target="_self"
+                    >
+                      <div>
+                        前言開發者在實務上難免會接觸到維運，而維運時一定會仰賴Log。在MVC架構下，想在服務獲得Http
+                        Request和回應給Client端Http
+                        Response時打印Log，若是土法煉鋼將Log寫在每個controller下，將會寫非常多的Code，在controller很多的情況下也很難管理。
+                        本篇將透過覆寫servlet filter的方式，自訂義一個filter
+                        chain打印Http R
+                      </div>
+                    </a>
+
+                    <div class="index-btm post-metas">
+                      <div class="post-meta mr-3">
+                        <i class="iconfont icon-date"></i>
+                        <time datetime="2024-10-03 21:31" pubdate>
+                          2024-10-03
+                        </time>
+                      </div>
+
+                      <div class="post-meta mr-3 d-flex align-items-center">
+                        <i class="iconfont icon-category"></i>
+
+                        <span class="category-chains">
+                          <span class="category-chain">
+                            <a
+                              href="/categories/Spring/"
+                              class="category-chain-item"
+                              >Spring</a
+                            >
+                          </span>
+                        </span>
+                      </div>
+
+                      <div class="post-meta">
+                        <i class="iconfont icon-tags"></i>
+
+                        <a href="/tags/Spring-Boot/">#Spring Boot</a>
+
+                        <a href="/tags/MainTain/">#MainTain</a>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="row mx-auto index-card">
+                  <article class="col-12 col-md-12 mx-auto index-info">
+                    <h2 class="index-header">
+                      <a
+                        href="/2024/09/30/%E4%BD%BF%E7%94%A8AWX%20%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/"
+                        target="_self"
+                      >
+                        使用AWX 於K8S中部署服務
+                      </a>
+                    </h2>
+
+                    <a
+                      class="index-excerpt index-excerpt__noimg"
+                      href="/2024/09/30/%E4%BD%BF%E7%94%A8AWX%20%E6%96%BCK8S%E4%B8%AD%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99/"
+                      target="_self"
+                    >
+                      <div>
+                        前言AWX的PlayBook功能非常強大，可以與多種服務、平台和基礎設施進行互動。
+                        例如: 雲提供商：AWX 可以與 AWS、Azure、Google Cloud
+                        等雲服務平台進行互動，支持虛擬機實例的創建、網絡設置、負載均衡器配置等操作。
+                        容器編排工具：AWX 與 Kubernetes、OpenShift
+                        等平台集成良好，能自動化容器應用的部署、升級和管理。
+                        版本控制系統：AWX 可以與
+                      </div>
+                    </a>
+
+                    <div class="index-btm post-metas">
+                      <div class="post-meta mr-3">
+                        <i class="iconfont icon-date"></i>
+                        <time datetime="2024-09-30 23:07" pubdate>
+                          2024-09-30
+                        </time>
+                      </div>
+
+                      <div class="post-meta mr-3 d-flex align-items-center">
+                        <i class="iconfont icon-category"></i>
+
+                        <span class="category-chains">
+                          <span class="category-chain">
+                            <a
+                              href="/categories/Ansible/"
+                              class="category-chain-item"
+                              >Ansible</a
+                            >
+                          </span>
+                        </span>
+                      </div>
+
+                      <div class="post-meta">
+                        <i class="iconfont icon-tags"></i>
+
+                        <a href="/tags/AWX/">#AWX</a>
+
+                        <a href="/tags/K8S/">#K8S</a>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="row mx-auto index-card">
+                  <article class="col-12 col-md-12 mx-auto index-info">
+                    <h2 class="index-header">
+                      <a href="/2024/09/29/Spring%20Cache/" target="_self">
+                        Spring Cache
+                      </a>
+                    </h2>
+
+                    <a
+                      class="index-excerpt index-excerpt__noimg"
+                      href="/2024/09/29/Spring%20Cache/"
+                      target="_self"
+                    >
+                      <div>
+                        前言我們平常在專案中查找資料往往都是直接訪問資料庫,但現今資料的量越來越大,訪問的次數及時間過於頻繁,這樣會對我們的資料庫帶來很大的負擔及效能上的問題,為了解決這個狀況,這邊採用Spring
+                        Cache
+                        整合Redis來實現。本文將透過簡單的實作，展示springBoot結合Redis並且實現快取。
+                        需要的依賴與設定Dependency12345&lt;dependency&gt; &lt;
+                      </div>
+                    </a>
+
+                    <div class="index-btm post-metas">
+                      <div class="post-meta mr-3">
+                        <i class="iconfont icon-date"></i>
+                        <time datetime="2024-09-29 23:18" pubdate>
+                          2024-09-29
+                        </time>
+                      </div>
+
+                      <div class="post-meta mr-3 d-flex align-items-center">
+                        <i class="iconfont icon-category"></i>
+
+                        <span class="category-chains">
+                          <span class="category-chain">
+                            <a
+                              href="/categories/Spring/"
+                              class="category-chain-item"
+                              >Spring</a
+                            >
+                          </span>
+                        </span>
+                      </div>
+
+                      <div class="post-meta">
+                        <i class="iconfont icon-tags"></i>
+
+                        <a href="/tags/Spring-Boot/">#Spring Boot</a>
+
+                        <a href="/tags/Spring-Cache/">#Spring Cache</a>
+
+                        <a href="/tags/Redis/">#Redis</a>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="row mx-auto index-card">
+                  <article class="col-12 col-md-12 mx-auto index-info">
+                    <h2 class="index-header">
+                      <a
+                        href="/2024/08/26/Ansible%20AWX%20RestAPI/"
+                        target="_self"
+                      >
+                        Ansible AWX RestAPI
+                      </a>
+                    </h2>
+
+                    <a
+                      class="index-excerpt index-excerpt__noimg"
+                      href="/2024/08/26/Ansible%20AWX%20RestAPI/"
+                      target="_self"
+                    >
+                      <div>
+                        前言AWX提供了RestAPI給開發者使用，開發者可以使用RestAPI開發更客製化的功能。AWX可以玩的API有非常多，這邊介紹筆者工作上用到的幾個API，並實作使用Spring
+                        Boot程式串接AWX RestAPI去啟動一個playbook。
+                        更多api資訊可參考官方文件:
+                        https://ansible.readthedocs.io/projects/awx/en/latest/rest_
+                      </div>
+                    </a>
+
+                    <div class="index-btm post-metas">
+                      <div class="post-meta mr-3">
+                        <i class="iconfont icon-date"></i>
+                        <time datetime="2024-08-26 16:25" pubdate>
+                          2024-08-26
+                        </time>
+                      </div>
+
+                      <div class="post-meta mr-3 d-flex align-items-center">
+                        <i class="iconfont icon-category"></i>
+
+                        <span class="category-chains">
+                          <span class="category-chain">
+                            <a
+                              href="/categories/Ansible/"
+                              class="category-chain-item"
+                              >Ansible</a
+                            >
+                          </span>
+                        </span>
+                      </div>
+
+                      <div class="post-meta">
+                        <i class="iconfont icon-tags"></i>
+
+                        <a href="/tags/AWX/">#AWX</a>
+
+                        <a href="/tags/K8S/">#K8S</a>
+
+                        <a href="/tags/RestAPI/">#RestAPI</a>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="row mx-auto index-card">
+                  <article class="col-12 col-md-12 mx-auto index-info">
+                    <h2 class="index-header">
+                      <a
+                        href="/2024/08/18/%E5%AF%A6%E7%8F%BEToken%20Based%E7%9A%84Single%20Sign%20On(SSO)/"
+                        target="_self"
+                      >
+                        實現Token Based的Single Sign On(SSO)
+                      </a>
+                    </h2>
+
+                    <a
+                      class="index-excerpt index-excerpt__noimg"
+                      href="/2024/08/18/%E5%AF%A6%E7%8F%BEToken%20Based%E7%9A%84Single%20Sign%20On(SSO)/"
+                      target="_self"
+                    >
+                      <div>
+                        前言在之前我們已經實現過使用Session
+                        Based的SSO，本篇我們來實作使用Token Based的SSO 架構圖
+                        說明: Web Client向Keycloak end-point
+                        &#123;&#123;server&#125;&#125;/realms/&#123;&#123;realm&#125;&#125;/protocol/openid-connect/token獲取access
+                      </div>
+                    </a>
+
+                    <div class="index-btm post-metas">
+                      <div class="post-meta mr-3">
+                        <i class="iconfont icon-date"></i>
+                        <time datetime="2024-08-18 21:58" pubdate>
+                          2024-08-18
+                        </time>
+                      </div>
+
+                      <div class="post-meta mr-3 d-flex align-items-center">
+                        <i class="iconfont icon-category"></i>
+
+                        <span class="category-chains">
+                          <span class="category-chain">
+                            <a
+                              href="/categories/Spring/"
+                              class="category-chain-item"
+                              >Spring</a
+                            >
+                          </span>
+                        </span>
+                      </div>
+
+                      <div class="post-meta">
+                        <i class="iconfont icon-tags"></i>
+
+                        <a href="/tags/Spring-Boot/">#Spring Boot</a>
+
+                        <a href="/tags/Spring-Security/">#Spring Security</a>
+
+                        <a href="/tags/Keyclaok/">#Keyclaok</a>
+
+                        <a href="/tags/OAuth2-0/">#OAuth2.0</a>
+
+                        <a href="/tags/OIDC/">#OIDC</a>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="row mx-auto index-card">
+                  <article class="col-12 col-md-12 mx-auto index-info">
+                    <h2 class="index-header">
+                      <a
+                        href="/2024/08/12/Spring-Session%20With%20Redis%20%E9%81%94%E5%88%B0Session%20%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/"
+                        target="_self"
+                      >
+                        Spring-Session With Redis 達到Session 集中式處理
+                      </a>
+                    </h2>
+
+                    <a
+                      class="index-excerpt index-excerpt__noimg"
+                      href="/2024/08/12/Spring-Session%20With%20Redis%20%E9%81%94%E5%88%B0Session%20%E9%9B%86%E4%B8%AD%E5%BC%8F%E8%99%95%E7%90%86/"
+                      target="_self"
+                    >
+                      <div>
+                        前言:我們都知道session是放在application端，當application
+                        中斷&#x2F;重啟時或是browser關閉&#x2F;登出時，session就會消失。筆者工作上是使用Keycloak做為Authenticaion
+                        server，並採取以下常見的架構。
+                        由於Nginx預設附載平衡機制是使用(round
+                        robin)，會導致一種情境: 當使用者透過Tomcat 1登入Ser
+                      </div>
+                    </a>
+
+                    <div class="index-btm post-metas">
+                      <div class="post-meta mr-3">
+                        <i class="iconfont icon-date"></i>
+                        <time datetime="2024-08-12 22:29" pubdate>
+                          2024-08-12
+                        </time>
+                      </div>
+
+                      <div class="post-meta mr-3 d-flex align-items-center">
+                        <i class="iconfont icon-category"></i>
+
+                        <span class="category-chains">
+                          <span class="category-chain">
+                            <a
+                              href="/categories/Spring/"
+                              class="category-chain-item"
+                              >Spring</a
+                            >
+                          </span>
+                        </span>
+                      </div>
+
+                      <div class="post-meta">
+                        <i class="iconfont icon-tags"></i>
+
+                        <a href="/tags/Spring-Boot/">#Spring Boot</a>
+
+                        <a href="/tags/Spring-Security/">#Spring Security</a>
+
+                        <a href="/tags/Spring-Redis-Session/"
+                          >#Spring Redis Session</a
+                        >
+
+                        <a href="/tags/Keyclaok/">#Keyclaok</a>
+
+                        <a href="/tags/OAuth2-0/">#OAuth2.0</a>
+
+                        <a href="/tags/OIDC/">#OIDC</a>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="row mx-auto index-card">
+                  <article class="col-12 col-md-12 mx-auto index-info">
+                    <h2 class="index-header">
+                      <a
+                        href="/2024/08/07/Minikube%E9%83%A8%E5%B1%ACAnsible%20AWX/"
+                        target="_self"
+                      >
+                        Minikube部屬Ansible AWX
+                      </a>
+                    </h2>
+
+                    <a
+                      class="index-excerpt index-excerpt__noimg"
+                      href="/2024/08/07/Minikube%E9%83%A8%E5%B1%ACAnsible%20AWX/"
+                      target="_self"
+                    >
+                      <div>
+                        前言繼上一篇我們部屬完Minikube後，本篇目標接著部屬Ansible
+                        AWX到Minikube，並且透過Ansible AWX API來啟動template
+                        安裝Ansible AWX 安裝helm&amp;設定環境變數 1curl
+                        https://get.helm.sh/helm-v3.10.2-windows-amd64.tar.gz
+                        依序執行以下指令 12helm repo ad
+                      </div>
+                    </a>
+
+                    <div class="index-btm post-metas">
+                      <div class="post-meta mr-3">
+                        <i class="iconfont icon-date"></i>
+                        <time datetime="2024-08-07 23:40" pubdate>
+                          2024-08-07
+                        </time>
+                      </div>
+
+                      <div class="post-meta mr-3 d-flex align-items-center">
+                        <i class="iconfont icon-category"></i>
+
+                        <span class="category-chains">
+                          <span class="category-chain">
+                            <a
+                              href="/categories/Ansible/"
+                              class="category-chain-item"
+                              >Ansible</a
+                            >
+                          </span>
+                        </span>
+                      </div>
+
+                      <div class="post-meta">
+                        <i class="iconfont icon-tags"></i>
+
+                        <a href="/tags/AWX/">#AWX</a>
+
+                        <a href="/tags/K8S/">#K8S</a>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+                <nav aria-label="navigation">
+                  <span class="pagination" id="pagination">
+                    <span class="page-number current">1</span
+                    ><a class="page-number" href="/page/2/#board">2</a
+                    ><a class="extend next" rel="next" href="/page/2/#board"
+                      ><i class="iconfont icon-arrowright"></i
+                    ></a>
+                  </span>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
         <i class="iconfont icon-arrowup" aria-hidden="true"></i>
       </a>
-    
 
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜尋</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v" for="local-search-input">關鍵字</label>
+      <div
+        class="modal fade"
+        id="modalSearch"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="ModalLabel"
+        aria-hidden="true"
+      >
+        <div
+          class="modal-dialog modal-dialog-scrollable modal-lg"
+          role="document"
+        >
+          <div class="modal-content">
+            <div class="modal-header text-center">
+              <h4 class="modal-title w-100 font-weight-bold">搜尋</h4>
+              <button
+                type="button"
+                id="local-search-close"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body mx-3">
+              <div class="md-form mb-5">
+                <input
+                  type="text"
+                  id="local-search-input"
+                  class="form-control validate"
+                />
+                <label data-error="x" data-success="v" for="local-search-input"
+                  >關鍵字</label
+                >
+              </div>
+              <div class="list-group" id="local-search-result"></div>
+            </div>
+          </div>
         </div>
-        <div class="list-group" id="local-search-result"></div>
       </div>
-    </div>
-  </div>
-</div>
+    </main>
 
-    
+    <footer>
+      <div class="footer-inner">
+        <div class="footer-content">
+          <a
+            href="mailto:jy811005@gmail.com"
+            target="_blank"
+            rel="nofollow noopener"
+            ><span>Produced by Jack Yang ©</span></a
+          >
+          <a
+            href="https://github.com/fluid-dev/hexo-theme-fluid"
+            target="_blank"
+            rel="nofollow noopener"
+            ><span>Fluid</span></a
+          >
+        </div>
+      </div>
+    </footer>
 
-    
-  </main>
+    <!-- Scripts -->
 
-  <footer>
-    <div class="footer-inner">
-  
-    <div class="footer-content">
-       <a href="mailto:jy811005@gmail.com" target="_blank" rel="nofollow noopener"><span>Produced by Jack Yang ©</span></a> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-    </div>
-  
-  
-  
-  
-</div>
+    <script src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css"
+    />
 
-  </footer>
+    <script>
+      NProgress.configure({ showSpinner: false, trickleSpeed: 100 });
+      NProgress.start();
+      window.addEventListener("load", function () {
+        NProgress.done();
+      });
+    </script>
 
-  <!-- Scripts -->
-  
-  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+    <script src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js"></script>
+    <script src="/js/events.js"></script>
+    <script src="/js/plugins.js"></script>
 
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
+    <script src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js"></script>
+    <script>
+      (function (window, document) {
+        var typing = Fluid.plugins.typing;
+        var subtitle = document.getElementById("subtitle");
+        if (!subtitle || !typing) {
+          return;
+        }
+        var text = subtitle.getAttribute("data-typed-text");
 
-
-<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
-<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-
-  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var subtitle = document.getElementById('subtitle');
-      if (!subtitle || !typing) {
-        return;
-      }
-      var text = subtitle.getAttribute('data-typed-text');
-      
         typing(text);
-      
-    })(window, document);
-  </script>
+      })(window, document);
+    </script>
 
+    <script src="/js/img-lazyload.js"></script>
 
+    <script src="/js/local-search.js"></script>
 
+    <!-- 主题的启动项，将它保持在最底部 -->
+    <!-- the boot of the theme, keep it at the bottom -->
+    <script src="/js/boot.js"></script>
 
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
-
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-
-<!-- 主题的启动项，将它保持在最底部 -->
-<!-- the boot of the theme, keep it at the bottom -->
-<script  src="/js/boot.js" ></script>
-
-
-  
-
-  <noscript>
-    <div class="noscript-warning">博客在允許 JavaScript 運行的環境下瀏覽效果更佳</div>
-  </noscript>
-</body>
+    <noscript>
+      <div class="noscript-warning">
+        博客在允許 JavaScript 運行的環境下瀏覽效果更佳
+      </div>
+    </noscript>
+  </body>
 </html>
