@@ -22,11 +22,11 @@
       
       <tag>Spring Security</tag>
       
-      <tag>Keyclaok</tag>
-      
       <tag>OAuth2.0</tag>
       
       <tag>OIDC</tag>
+      
+      <tag>Keyclaok</tag>
       
     </tags>
     
@@ -78,9 +78,9 @@
     
     <tags>
       
-      <tag>Spring WebFlux</tag>
-      
       <tag>Spring MVC</tag>
+      
+      <tag>Spring WebFlux</tag>
       
     </tags>
     
@@ -221,11 +221,11 @@
       
       <tag>Spring Security</tag>
       
-      <tag>Keyclaok</tag>
-      
       <tag>OAuth2.0</tag>
       
       <tag>OIDC</tag>
+      
+      <tag>Keyclaok</tag>
       
     </tags>
     
@@ -256,11 +256,11 @@
       
       <tag>Spring Redis Session</tag>
       
-      <tag>Keyclaok</tag>
-      
       <tag>OAuth2.0</tag>
       
       <tag>OIDC</tag>
+      
+      <tag>Keyclaok</tag>
       
     </tags>
     
@@ -343,11 +343,11 @@
       
       <tag>Spring Security</tag>
       
-      <tag>Keyclaok</tag>
-      
       <tag>OAuth2.0</tag>
       
       <tag>OIDC</tag>
+      
+      <tag>Keyclaok</tag>
       
     </tags>
     
