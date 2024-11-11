@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/5020cf20-60a1-454a-b610-9113a6c05a58.webp">
 <meta property="article:published_time" content="2024-11-11T16:30:25.864Z">
-<meta property="article:modified_time" content="2024-11-11T16:31:30.603Z">
+<meta property="article:modified_time" content="2024-11-11T16:32:06.266Z">
 <meta property="article:author" content="Jack Yang">
 <meta property="article:tag" content="Spring Data Jpa">
 <meta name="twitter:card" content="summary_large_image">
@@ -316,8 +316,7 @@
 <p>假設今天有兩張表 Student、Course，當你查詢Student這張表時，ORM 會執行一個主查詢（例如 SELECT * FROM Student），載入出所有的 Student 記錄，但因為使用Lazy Loading的關係不會立即載入 Course這張表 。</p>
 <p>當你遍歷每一個 Student 並嘗試存取他們的 Course 集合時，ORM 會為每個 Student 內的每筆資料執行一個新的查詢（例如 SELECT * FROM Course WHERE student_id &#x3D; ?），因此總共需要 N + 1 次查詢：</p>
 <p>1次查詢 用於載入所有 Student 記錄。<br>N次查詢 用於逐一載入每個 Student 對應的 Course 集合（其中 N 是 Student 的筆數）。</p>
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p>為什麼這會影響效能？</p>
-<p>當 N 的數量較大時，每個 Student 都會觸發一次新的查詢來載入 Course，這會導致大量資料庫查詢，造成效能問題。特別是在擁有大量資料的系統中，N+1 問題可能會顯著拖慢程式!</p>
+<h2 id="為什麼這會影響效能？"><a href="#為什麼這會影響效能？" class="headerlink" title="為什麼這會影響效能？"></a>為什麼這會影響效能？</h2><p>當 N 的數量較大時，每個 Student 都會觸發一次新的查詢來載入 Course，這會導致大量資料庫查詢，造成效能問題。特別是在擁有大量資料的系統中，N+1 問題可能會顯著拖慢程式!</p>
 <h2 id="如何解決N-1問題"><a href="#如何解決N-1問題" class="headerlink" title="如何解決N+1問題"></a>如何解決N+1問題</h2><p>我們將討論3種在JPA中解決N+1問題的方式</p>
 <ol>
 <li><p>使用@EntityGraph Annotation</p>
