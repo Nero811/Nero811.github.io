@@ -16,36 +16,25 @@
   <meta name="author" content="Jack Yang">
   <meta name="keywords" content="">
   
-    <meta name="description" content="前言本篇以Keycloak作為Authorizaion Server，詳細解說每一段OIDC Authorization Code Flow。 架構Resorce Owner → localhost:8082 Spring Security → localhost:8081 Keycloak Server → localhost:8080  OAuth 2.0 + OIDC Authorizati">
+    <meta name="description" content="何謂N+1 ProblemN+1 問題通常出現在 ORM 框架 使用懶負載（Lazy Loading） 的情境下。 假設今天有兩張表 Student、Course，當你查詢Student這張表時，ORM 會執行一個主查詢（例如 SELECT * FROM Student），載入出所有的 Student 記錄，但因為使用Lazy Loading的關係不會立即載入 Course這張表 。 當你遍歷每一">
 <meta property="og:type" content="article">
-<meta property="og:title" content="詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟">
-<meta property="og:url" content="https://nero811.github.io/2024/10/15/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth%202.0%20+%20OIDC%20Authorization%20Code%20Flow%20%E6%AD%A5%E9%A9%9F/index.html">
+<meta property="og:title" content="Jpa &amp; N+1 Problem">
+<meta property="og:url" content="https://nero811.github.io/2024/11/12/Jpa%20&%20N+1%20Problem/index.html">
 <meta property="og:site_name" content="Jack的後端工程師筆記">
-<meta property="og:description" content="前言本篇以Keycloak作為Authorizaion Server，詳細解說每一段OIDC Authorization Code Flow。 架構Resorce Owner → localhost:8082 Spring Security → localhost:8081 Keycloak Server → localhost:8080  OAuth 2.0 + OIDC Authorizati">
+<meta property="og:description" content="何謂N+1 ProblemN+1 問題通常出現在 ORM 框架 使用懶負載（Lazy Loading） 的情境下。 假設今天有兩張表 Student、Course，當你查詢Student這張表時，ORM 會執行一個主查詢（例如 SELECT * FROM Student），載入出所有的 Student 記錄，但因為使用Lazy Loading的關係不會立即載入 Course這張表 。 當你遍歷每一">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/120e09e7-188c-806c-a9ed-e0a0fa19a24b.webp">
-<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807f-9596-dd4922bbff59.webp">
-<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-806f-9b4e-fbea9b7727c2.webp">
-<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-80bd-aeda-df1bb2af4455.webp">
-<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-809b-8431-e16f7ec9d931.webp">
-<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807f-995f-c0d64ca073a8.webp">
-<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-803b-85fb-e2d28a5c55d9.webp">
-<meta property="og:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807c-8708-fc6db46c9b3d.webp">
-<meta property="article:published_time" content="2024-10-15T14:32:59.022Z">
-<meta property="article:modified_time" content="2024-10-15T14:33:51.734Z">
+<meta property="og:image" content="https://nero811.github.io/img/default.webp">
+<meta property="article:published_time" content="2024-11-11T16:30:25.864Z">
+<meta property="article:modified_time" content="2024-11-11T16:30:27.148Z">
 <meta property="article:author" content="Jack Yang">
-<meta property="article:tag" content="Spring Security">
-<meta property="article:tag" content="OAuth2.0">
-<meta property="article:tag" content="OIDC">
-<meta property="article:tag" content="Keyclaok">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://nero811.github.io/image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/120e09e7-188c-806c-a9ed-e0a0fa19a24b.webp">
+<meta name="twitter:image" content="https://nero811.github.io/img/default.webp">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟 - Jack的後端工程師筆記</title>
+  <title>Jpa &amp; N+1 Problem - Jack的後端工程師筆記</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -232,13 +221,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/undraw_Programming_re_kg9v.png') no-repeat center center; background-size: cover;">
+     style="background: url('/img/default.webp') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟</span>
+            <span id="subtitle">Jpa & N+1 Problem</span>
           
         </div>
 
@@ -249,8 +238,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-10-15 22:32" pubdate>
-          2024年10月15日 晚上
+        <time datetime="2024-11-12 00:30" pubdate>
+          2024年11月12日 凌晨
         </time>
       </span>
     
@@ -261,7 +250,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          463 字
+          285 字
         
       </span>
     
@@ -272,7 +261,7 @@
         
         
         
-          4 分鐘
+          3 分鐘
         
       </span>
     
@@ -317,45 +306,27 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟</h1>
+            <h1 id="seo-header">Jpa &amp; N+1 Problem</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本篇以Keycloak作為Authorizaion Server，詳細解說每一段OIDC Authorization Code Flow。</p>
-<h1 id="架構"><a href="#架構" class="headerlink" title="架構"></a>架構</h1><p>Resorce Owner → localhost:8082</p>
-<p>Spring Security → localhost:8081</p>
-<p>Keycloak Server → localhost:8080</p>
-<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/120e09e7-188c-806c-a9ed-e0a0fa19a24b.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<h1 id="OAuth-2-0-OIDC-Authorization-Code-Flow-步驟："><a href="#OAuth-2-0-OIDC-Authorization-Code-Flow-步驟：" class="headerlink" title="OAuth 2.0 + OIDC Authorization Code Flow 步驟："></a>OAuth 2.0 + OIDC Authorization Code Flow 步驟：</h1><h2 id="Resource-Owner-訪問-Spring-Security-微服務"><a href="#Resource-Owner-訪問-Spring-Security-微服務" class="headerlink" title="Resource Owner 訪問 Spring Security 微服務"></a>Resource Owner 訪問 Spring Security 微服務</h2><p>Resource Owner 請求一個受保護的資源（API 或頁面）。Spring Security 微服務檢查當前請求是否包含有效的授權資訊（例如 Access Token 或 Session）。如果沒有，則需要進行認證。</p>
-<h2 id="Spring-Security-發起-302-Redirect"><a href="#Spring-Security-發起-302-Redirect" class="headerlink" title="Spring Security 發起 302 Redirect"></a>Spring Security 發起 302 Redirect</h2><p>Spring Security 微服務偵測到沒有授權，將 Resource Owner 重定向到 Keycloak 進行認證，透過 Spring Security 的 OAuth 2.0 設定進行，通常是：</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk"><br>http:<span class="hljs-regexp">//</span>&#123;CLIENT_URL&#125;:&#123;PORT&#125;<span class="hljs-regexp">/oauth2/</span>authorization/keycloak<br></code></pre></td></tr></table></figure>
-
-<p>這個 URL 會觸發重定向到 Keycloak 的授權端點。</p>
-<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807f-9596-dd4922bbff59.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<h2 id="重導向到-Keycloak-授權端點-Authorization-Endpoint"><a href="#重導向到-Keycloak-授權端點-Authorization-Endpoint" class="headerlink" title="重導向到 Keycloak 授權端點 (Authorization Endpoint)"></a>重導向到 Keycloak 授權端點 (Authorization Endpoint)</h2><p>帶著 <code>client_id</code>、<code>scope=openid</code>（請求 OIDC）、<code>redirect_uri</code> 等參數，發起一個 302 Redirect 到 Keycloak 的授權端點：</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk"><br>http:<span class="hljs-regexp">//</span>&#123;KEYCLOAK_URL&#125;:&#123;PORT&#125;<span class="hljs-regexp">/realms/</span>&#123;realm_id&#125;<span class="hljs-regexp">/protocol/</span>openid-connect/auth?<br></code></pre></td></tr></table></figure>
-
-<p>這裡 Spring Security 發起 OAuth 2.0 授權請求，要求 OIDC 認證。</p>
-<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-806f-9b4e-fbea9b7727c2.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p>此時雖然會出現登入畫面給Resource Owner輸入帳號密碼，但實際上Keycloak會在後台將使用者資訊帶到下一個用戶認證 (Login Actions Authenticate)才真正進行認證。</p>
-<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-80bd-aeda-df1bb2af4455.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<h2 id="Keycloak-用戶認證-Login-Actions-Authenticate"><a href="#Keycloak-用戶認證-Login-Actions-Authenticate" class="headerlink" title="Keycloak 用戶認證 (Login Actions Authenticate)"></a>Keycloak 用戶認證 (Login Actions Authenticate)</h2><p>Keycloak 在這個端點進行身分驗證（如帳號密碼、憑證）。</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk"><br>http:<span class="hljs-regexp">//</span>&#123;KEYCLOAK_URL&#125;:&#123;PORT&#125;<span class="hljs-regexp">/realms/</span>&#123;realm_id&#125;<span class="hljs-regexp">/login-actions/</span>authenticate?<br></code></pre></td></tr></table></figure>
-
-<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-809b-8431-e16f7ec9d931.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807f-995f-c0d64ca073a8.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<h2 id="Keycloak-發回-Authorization-Code"><a href="#Keycloak-發回-Authorization-Code" class="headerlink" title="Keycloak 發回 Authorization Code"></a>Keycloak 發回 Authorization Code</h2><p>認證成功後，Keycloak 會生成一個 Authorization Code，並帶著 <code>code</code> 和 <code>state</code> 參數發起 302 Redirect，將 Resource Owner 重定向回 <code>redirect_uri</code>（Spring Security 微服務的端點）：</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk"><br>http:<span class="hljs-regexp">//</span>&#123;CLIENT_URL&#125;:&#123;PORT&#125;<span class="hljs-regexp">/login/</span>oauth2<span class="hljs-regexp">/code/</span>keycloak<br></code></pre></td></tr></table></figure>
-
-<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-803b-85fb-e2d28a5c55d9.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<h2 id="Spring-Security-微服務換取-Token"><a href="#Spring-Security-微服務換取-Token" class="headerlink" title="Spring Security 微服務換取 Token"></a>Spring Security 微服務換取 Token</h2><p>Spring Security 微服務在收到 Authorization Code 後，會攜帶這個 <code>code</code>、<code>client_id</code>、<code>client_secret</code> 發送 POST 請求到 Keycloak 的 Token Endpoint 以換取 Access Token、ID Token 和 Refresh Token。</p>
-<p>端點：</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk"><br>http:<span class="hljs-regexp">//</span>&#123;KEYCLOAK_URL&#125;:&#123;PORT&#125;<span class="hljs-regexp">/realms/</span>&#123;realm_id&#125;<span class="hljs-regexp">/protocol/</span>openid-connect/token<br></code></pre></td></tr></table></figure>
-
-<h2 id="Keycloak-返回-Tokens"><a href="#Keycloak-返回-Tokens" class="headerlink" title="Keycloak 返回 Tokens"></a>Keycloak 返回 Tokens</h2><p>Keycloak 驗證請求後，返回 Access Token、ID Token 和可選的 Refresh Token 給 Spring Security 微服務。</p>
-<h2 id="Spring-Security-微服務處理-Token，創建Session"><a href="#Spring-Security-微服務處理-Token，創建Session" class="headerlink" title="Spring Security 微服務處理 Token，創建Session"></a>Spring Security 微服務處理 Token，創建Session</h2><p>Spring Security 接收並處理這些 Tokens，將它們與 Resource Owner 綁定，並可能生成 JSessionID（如果使用Session管理），將 Resource Owner 重定向到原始請求的受保護資源。</p>
-<p><img src="/./image/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth_2.0_+_OIDC_Authorization_Code_Flow_%E6%AD%A5%E9%A9%9F/11fe09e7-188c-807c-8708-fc6db46c9b3d.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+                <h1 id="何謂N-1-Problem"><a href="#何謂N-1-Problem" class="headerlink" title="何謂N+1 Problem"></a>何謂N+1 Problem</h1><p>N+1 問題通常出現在 ORM 框架 使用懶負載（Lazy Loading） 的情境下。</p>
+<p>假設今天有兩張表 Student、Course，當你查詢Student這張表時，ORM 會執行一個主查詢（例如 SELECT * FROM Student），載入出所有的 Student 記錄，但因為使用Lazy Loading的關係不會立即載入 Course這張表 。</p>
+<p>當你遍歷每一個 Student 並嘗試存取他們的 Course 集合時，ORM 會為每個 Student 內的每筆資料執行一個新的查詢（例如 SELECT * FROM Course WHERE student_id &#x3D; ?），因此總共需要 N + 1 次查詢：</p>
+<p>1次查詢 用於載入所有 Student 記錄。<br>N次查詢 用於逐一載入每個 Student 對應的 Course 集合（其中 N 是 Student 的筆數）。</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p>為什麼這會影響效能？</p>
+<p>當 N 的數量較大時，每個 Student 都會觸發一次新的查詢來載入 Course，這會導致大量資料庫查詢，造成效能問題。特別是在擁有大量資料的系統中，N+1 問題可能會顯著拖慢程式!</p>
+<h2 id="如何解決N-1問題"><a href="#如何解決N-1問題" class="headerlink" title="如何解決N+1問題"></a>如何解決N+1問題</h2><p>我們將討論3種在JPA中解決N+1問題的方式</p>
+<ol>
+<li><p>使用@EntityGraph Annotation</p>
+</li>
+<li><p>將 FetchType 調整為 EAGER</p>
+</li>
+<li><p>在JPQL中使用Join</p>
+</li>
+</ol>
+<p><img src="/./image/Jpa_&_N+1_Problem/5020cf20-60a1-454a-b610-9113a6c05a58.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
 
                 
               </div>
@@ -364,40 +335,6 @@
             <div>
               <div class="post-metas my-3">
   
-    <div class="post-meta mr-3 d-flex align-items-center">
-      <i class="iconfont icon-category"></i>
-      
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-    </div>
-  
-  
-    <div class="post-meta">
-      <i class="iconfont icon-tags"></i>
-      
-        <a href="/tags/Spring-Security/" class="print-no-link">#Spring Security</a>
-      
-        <a href="/tags/OAuth2-0/" class="print-no-link">#OAuth2.0</a>
-      
-        <a href="/tags/OIDC/" class="print-no-link">#OIDC</a>
-      
-        <a href="/tags/Keyclaok/" class="print-no-link">#Keyclaok</a>
-      
-    </div>
   
 </div>
 
@@ -407,8 +344,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟</div>
-      <div>https://nero811.github.io/2024/10/15/詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟/</div>
+      <div>Jpa &amp; N+1 Problem</div>
+      <div>https://nero811.github.io/2024/11/12/Jpa &amp; N+1 Problem/</div>
     </div>
     <div class="license-meta">
       
@@ -420,7 +357,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>發布於</div>
-          <div>2024年10月15日</div>
+          <div>2024年11月12日</div>
         </div>
       
       
@@ -452,18 +389,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/11/12/Jpa%20&amp;%20N+1%20Problem/" title="Jpa &amp; N+1 Problem">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Jpa &amp; N+1 Problem</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/10/13/%E4%BD%BF%E7%94%A8AtomicBoolean%E5%AE%89%E5%85%A8%E7%9A%84%E5%9F%B7%E8%A1%8C%E5%A4%9A%E5%9F%B7%E8%A1%8C%E7%B7%92/" title="使用AtomicBoolean安全的執行多執行緒">
-                        <span class="hidden-mobile">使用AtomicBoolean安全的執行多執行緒</span>
+                      <a href="/2024/10/15/%E8%A9%B3%E7%B4%B0%E8%AA%AA%E6%98%8EOAuth%202.0%20+%20OIDC%20Authorization%20Code%20Flow%20%E6%AD%A5%E9%A9%9F/" title="詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟">
+                        <span class="hidden-mobile">詳細說明OAuth 2.0 + OIDC Authorization Code Flow 步驟</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
