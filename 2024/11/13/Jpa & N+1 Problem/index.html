@@ -23,16 +23,18 @@
 <meta property="og:site_name" content="Jack的後端工程師筆記">
 <meta property="og:description" content="何謂N+1 ProblemN+1 問題通常出現在 ORM 框架 使用懶負載（Lazy Loading） 的情境下。 假設今天有兩張表 Student、Course，當你查詢Student這張表時，ORM 會執行一個主查詢（例如 SELECT * FROM Student），載入出所有的 Student ，但因為使用Lazy Loading的關係不會立即載入 Course這張表 。 12345678">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/afe6e046-c064-456e-8d02-1353d6a34e95.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/2b5a574f-f784-41ba-a96f-1c0fa84f3c0d.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/14fc2d8a-d9bf-45ae-803b-7aafd2255468.webp">
-<meta property="og:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/0431e8f5-2274-4422-8e3c-e3596934f495.webp">
-<meta property="article:published_time" content="2024-11-12T16:01:15.681Z">
-<meta property="article:modified_time" content="2024-11-12T16:02:36.995Z">
+<meta property="og:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/13de09e7-188c-817d-82dd-c5ae1f3b5aae.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/13de09e7-188c-8101-9ed2-c9a51bf71141.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/13de09e7-188c-81c3-a306-dfb36eb47bc9.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/13de09e7-188c-81ba-8508-cccdf7ec36d3.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/13de09e7-188c-818a-9ba9-ca1447897465.webp">
+<meta property="og:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/13de09e7-188c-8147-b093-e7b4e40b22d0.webp">
+<meta property="article:published_time" content="2024-11-13T15:05:23.490Z">
+<meta property="article:modified_time" content="2024-11-13T15:08:59.746Z">
 <meta property="article:author" content="Jack Yang">
 <meta property="article:tag" content="Spring Data Jpa">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/afe6e046-c064-456e-8d02-1353d6a34e95.webp">
+<meta name="twitter:image" content="https://nero811.github.io/image/Jpa_&_N+1_Problem/13de09e7-188c-817d-82dd-c5ae1f3b5aae.webp">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -242,8 +244,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-11-13 00:01" pubdate>
-          2024年11月13日 凌晨
+        <time datetime="2024-11-13 23:05" pubdate>
+          2024年11月13日 晚上
         </time>
       </span>
     
@@ -254,7 +256,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.3k 字
+          2.4k 字
         
       </span>
     
@@ -265,7 +267,7 @@
         
         
         
-          11 分鐘
+          20 分鐘
         
       </span>
     
@@ -331,7 +333,8 @@
 <li><p>在JPQL中使用Join</p>
 </li>
 </ol>
-<p><img src="/./image/Jpa_&_N+1_Problem/afe6e046-c064-456e-8d02-1353d6a34e95.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>在下面的範例中因為都是many to many，所以我們必須建立一張關聯student和course的表</p>
+<p><img src="/./image/Jpa_&_N+1_Problem/13de09e7-188c-817d-82dd-c5ae1f3b5aae.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
 <h1 id="將-FetchType-調整為-EAGER"><a href="#將-FetchType-調整為-EAGER" class="headerlink" title="將 FetchType 調整為 EAGER"></a>將 FetchType 調整為 EAGER</h1><p>直到JPA 2.0如果要關聯兩個Entity，我們除了使用FetchType.LAZY外，另外一個就是FetchType.EAGER。FetchType.EAGER的特性是無論關聯的Data是否有被使用，都會強制去載入另外一個關聯實體。</p>
 <p>如下面的例子，</p>
 <p>今天當我們分別建立了兩個Entity: Student、Course</p>
@@ -346,8 +349,8 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Test</span><br><span class="hljs-keyword">void</span> <span class="hljs-title function_">testFindAll</span><span class="hljs-params">()</span> &#123;<br>	List&lt;Student&gt; students = studentRepository.findAll();<br>	students.forEach(student -&gt; &#123;<br>		log.info(<span class="hljs-string">&quot;Student: &#123;&#125;&quot;</span>, student);<br>	&#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>Output:</p>
-<p><img src="/./image/Jpa_&_N+1_Problem/2b5a574f-f784-41ba-a96f-1c0fa84f3c0d.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
-<p>雖然FetchType.EAGER看似很方便還能解決N+1問題，但是也是有不少隱藏的問題，</p>
+<p><img src="/./image/Jpa_&_N+1_Problem/13de09e7-188c-8101-9ed2-c9a51bf71141.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<h3 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h3><p>雖然FetchType.EAGER看似很方便還能解決N+1問題，但是也是有不少隱藏的問題，</p>
 <ol>
 <li><p>這個做法不夠彈性: 今天如果我們只想使用Student這個entity，但是在使用findAll()查詢所有的Student時，就會一併將我們不需要的courses資料都找出來。</p>
 </li>
@@ -356,14 +359,21 @@
 </ol>
 <h1 id="NamedEntityGraph-、-EntityGraph-Annotations"><a href="#NamedEntityGraph-、-EntityGraph-Annotations" class="headerlink" title="@NamedEntityGraph 、@EntityGraph Annotations"></a>@NamedEntityGraph 、@EntityGraph Annotations</h1><p>在JPA2.1中，為了解決FetchType.LAZY及FetchType.EAGER都有缺點，@NamedEntityGraph、@EntityGraph這兩個Annotations誕生拉! </p>
 <p>我們改寫一下Student Entity</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Getter</span><br><span class="hljs-meta">@Entity</span><br><span class="hljs-meta">@NamedEntityGraph(</span><br><span class="hljs-meta">        name = &quot;Student.courses&quot;,</span><br><span class="hljs-meta">        attributeNodes = @NamedAttributeNode(&quot;courses&quot;)</span><br><span class="hljs-meta">)</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Student</span> &#123;<br><br>    <span class="hljs-meta">@Id</span><br>    <span class="hljs-meta">@GeneratedValue(strategy = GenerationType.IDENTITY)</span><br>    <span class="hljs-keyword">private</span> Long id;<br><br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-meta">@ManyToMany(fetch = FetchType.LAZY)</span><br>    <span class="hljs-meta">@JoinTable(</span><br><span class="hljs-meta">            name = &quot;student_course&quot;,</span><br><span class="hljs-meta">            joinColumns = @JoinColumn(name = &quot;student_id&quot;),</span><br><span class="hljs-meta">            inverseJoinColumns = @JoinColumn(name = &quot;course_id&quot;)</span><br><span class="hljs-meta">    )</span><br>    <span class="hljs-keyword">private</span> Set&lt;Course&gt; courses;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Student&#123;&quot;</span> +<br>                <span class="hljs-string">&quot;id=&quot;</span> + id +<br>                <span class="hljs-string">&quot;, name=&#x27;&quot;</span> + name + <span class="hljs-string">&#x27;\&#x27;&#x27;</span> +<br>                <span class="hljs-string">&quot;, courses=&quot;</span> + courses +<br>                <span class="hljs-string">&#x27;&#125;&#x27;</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Getter</span><br><span class="hljs-meta">@Entity</span><br><span class="hljs-meta">@NamedEntityGraph(</span><br><span class="hljs-meta">        name = &quot;Student.courses&quot;,</span><br><span class="hljs-meta">        attributeNodes = @NamedAttributeNode(&quot;courses&quot;)</span><br><span class="hljs-meta">)</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Student</span> &#123;<br><br>    <span class="hljs-meta">@Id</span><br>    <span class="hljs-meta">@GeneratedValue(strategy = GenerationType.IDENTITY)</span><br>    <span class="hljs-keyword">private</span> Long id;<br><br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-meta">@ManyToMany(fetch = FetchType.LAZY)</span><br>    <span class="hljs-meta">@JoinTable(</span><br><span class="hljs-meta">            name = &quot;student_course&quot;,</span><br><span class="hljs-meta">            joinColumns = @JoinColumn(name = &quot;student_id&quot;),</span><br><span class="hljs-meta">            inverseJoinColumns = @JoinColumn(name = &quot;course_id&quot;)</span><br><span class="hljs-meta">    )</span><br>    <span class="hljs-keyword">private</span> Set&lt;Course&gt; courses;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <ul>
-<li><p>@NamedEntityGraph </p>
+<li><p>@NamedEntityGraph<br>定義了一個Entity Graph，用於指定在查詢 Student 實體時應一併載入的關聯實體</p>
 </li>
-<li><p>name &#x3D; “Student.courses”</p>
+<li><p>name &#x3D; “Student.courses”<br>指定該Entity Graph的名稱，方便在查詢時引用。這個名字可以是任意字串，在此例中它叫做 “Student.courses”，表示這是一個與 Student 相關的圖，並會載入 Student 實體的 courses 屬性。</p>
 </li>
-<li><p>attributeNodes &#x3D; @NamedAttributeNode(“courses”)</p>
+<li><p>attributeNodes &#x3D; @NamedAttributeNode(“courses”)<br>定義該Entity Graph中需要即時載入的屬性。 @NamedAttributeNode(“courses”) 表示在使用此實體圖表時，JPA 會載入 Student 實體的 courses 屬性。這表示在查詢 Student 時，關聯的 courses 集合會立即載入（通常使用 JOIN 查詢），而不是在存取 courses 時才進行懶載入。</p>
+</li>
+<li><p>@JoinTable<br> 註解用於定義一個中間表（即關聯式表），在資料庫中儲存多對多的關聯式對應。這裡指定的表名是 student_course，表示 Student 和 Course 之間的關聯關係。<br> 如果沒有 @JoinTable，JPA 會自動產生一個名字並不總是符合預期的中間表名，透過 @JoinTable 可以手動控制這個表名。</p>
+</li>
+<li><p>joinColumns<br>定義 Student 在 student_course 表中的外鍵列。 @JoinColumn(name &#x3D; “student_id”)</p>
+<p>表示 student_course 表中的 student_id 欄位是指向 Student 表主鍵 id 的外鍵。</p>
+</li>
+<li><p>inverseJoinColumns<br>定義 Course 在 student_course 表中的外鍵列。 @JoinColumn(name &#x3D; “course_id”)<br>表示 student_course 表中的 course_id 欄位是指向 Course 表格主鍵 id 的外鍵。</p>
 </li>
 </ul>
 <p>我們再重新定義一次Repository</p>
@@ -375,15 +385,40 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Test</span><br><span class="hljs-keyword">void</span> <span class="hljs-title function_">testFindAll</span><span class="hljs-params">()</span> &#123;<br>	List&lt;Student&gt; students = studentRepository.findAll();<br>	students.forEach(student -&gt; &#123;<br>		log.info(<span class="hljs-string">&quot;Student: &#123;&#125;&quot;</span>, student);<br>	&#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>Output:</p>
-<p><img src="/./image/Jpa_&_N+1_Problem/14fc2d8a-d9bf-45ae-803b-7aafd2255468.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/Jpa_&_N+1_Problem/13de09e7-188c-81c3-a306-dfb36eb47bc9.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
 <p>我們可以看到，這就跟使用FetchType.EAGER得到的結果相同!</p>
 <p>我們回頭再看一次StudentRepository ，我們可以發現在findByName這個method上面我們沒有加上</p>
-<p>@EntityGraph，而這會發生什麼事呢? 我們使用單元測試在跑一次看看。</p>
+<p>@EntityGraph， 我們使用單元測試跑一次testFindByName()看看。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Test</span><br><span class="hljs-keyword">void</span> <span class="hljs-title function_">testFindByName</span><span class="hljs-params">()</span> &#123;<br>	List&lt;Student&gt; students = studentRepository.findByName(<span class="hljs-string">&quot;Alice&quot;</span>);<br>	students.forEach(student -&gt; &#123;<br>		log.info(<span class="hljs-string">&quot;Student: &#123;&#125;&quot;</span>, student);<br>	&#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>Output:</p>
-<p><img src="/./image/Jpa_&_N+1_Problem/0431e8f5-2274-4422-8e3c-e3596934f495.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/Jpa_&_N+1_Problem/13de09e7-188c-81ba-8508-cccdf7ec36d3.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
 <p>我們可以看到噴出了LazyInitializationException，會噴出這個Exception的原因是在 Student 實體的 courses 屬性上使用了 @ManyToMany(fetch &#x3D; FetchType.LAZY)，因此 courses 集合會在真正存取時才從資料庫載入。然而，在 testFindByName() 方法中，courses 集合在 Session 已經關閉後才被訪問，導致無法完成載入。這是因為在預設情況下，Spring Data JPA 會在 Repository 方法執行完後立即關閉 Session，而測試程式碼中的 forEach 存取 courses 時，Session 已經不可用了。</p>
+<p>這時我們先將Student Entity內的ToString註解掉，並且再跑一次單元測試，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Getter</span><br><span class="hljs-meta">@Entity</span><br><span class="hljs-meta">@NamedEntityGraph(</span><br><span class="hljs-meta">        name = &quot;Student.courses&quot;,</span><br><span class="hljs-meta">        attributeNodes = @NamedAttributeNode(&quot;courses&quot;)</span><br><span class="hljs-meta">)</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Student</span> &#123;<br><br>    <span class="hljs-meta">@Id</span><br>    <span class="hljs-meta">@GeneratedValue(strategy = GenerationType.IDENTITY)</span><br>    <span class="hljs-keyword">private</span> Long id;<br><br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-meta">@ManyToMany(fetch = FetchType.LAZY)</span><br>    <span class="hljs-meta">@JoinTable(</span><br><span class="hljs-meta">            name = &quot;student_course&quot;,</span><br><span class="hljs-meta">            joinColumns = @JoinColumn(name = &quot;student_id&quot;),</span><br><span class="hljs-meta">            inverseJoinColumns = @JoinColumn(name = &quot;course_id&quot;)</span><br><span class="hljs-meta">    )</span><br>    <span class="hljs-keyword">private</span> Set&lt;Course&gt; courses;<br><br><span class="hljs-comment">//    @Override</span><br><span class="hljs-comment">//    public String toString() &#123;</span><br><span class="hljs-comment">//        return &quot;Student&#123;&quot; +</span><br><span class="hljs-comment">//                &quot;id=&quot; + id +</span><br><span class="hljs-comment">//                &quot;, name=&#x27;&quot; + name + &#x27;\&#x27;&#x27; +</span><br><span class="hljs-comment">//                &quot;, courses=&quot; + courses +</span><br><span class="hljs-comment">//                &#x27;&#125;&#x27;;</span><br><span class="hljs-comment">//    &#125;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java">   <span class="hljs-meta">@Test</span><br><span class="hljs-keyword">void</span> <span class="hljs-title function_">testFindByName</span><span class="hljs-params">()</span> &#123;<br>	List&lt;Student&gt; students = studentRepository.findByName(<span class="hljs-string">&quot;Alice&quot;</span>);<br>	students.forEach(student -&gt; &#123;<br>		log.info(<span class="hljs-string">&quot;Student: &#123;&#125;&quot;</span>, student);<br>		log.info(<span class="hljs-string">&quot;course: &#123;&#125;&quot;</span>, student.getCourses());<br>	&#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>Output:</p>
+<p><img src="/./image/Jpa_&_N+1_Problem/13de09e7-188c-818a-9ba9-ca1447897465.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p><img src="/./image/Jpa_&_N+1_Problem/13de09e7-188c-8147-b093-e7b4e40b22d0.webp" srcset="/img/loading.gif" lazyload alt="Image"></p>
+<p>我們可以從Hibernate產生的SQL中看到，我們在log.info(“Student: {}”, student);由於我們使用FetchType.LAZY而且沒有使用到course屬性，因此jpa不會去自動加載course的實體。而當我們使用</p>
+<p>log.info(“course: {}”, student.getCourses());因為我們去使用到了course屬性，所以jpa就會自動去幫我們加載course實體了!</p>
+<p>到這邊我們可以看到，即使我們設定FetchType.LAZY，只要使用@NamedEntityGraph 搭配 @EntityGraph 我們也可以達到跟設定FetchType.EAGER一樣的效果，這們一來我們只要在需要自動加載關聯實體的method上加入@EntityGraph就好了。</p>
+<h2 id="結論-1"><a href="#結論-1" class="headerlink" title="結論"></a>結論</h2><p>JPA 2.1 後加入的@NamedEntityGraph + @EntityGraph 就是要來解決原本FetchType.EAGER不夠彈性的問題，也是目前JPA官方比較推薦的做法!</p>
+<h1 id="使用JPQL"><a href="#使用JPQL" class="headerlink" title="使用JPQL"></a>使用JPQL</h1><p>JPQL是JPA的查詢語言，我們可以使用@Query這個Annotation，透過Spring Data Jpa操作JPQL。JPQL是透過實體的查詢，並將結果存在實體當中。</p>
+<p>我們先建立一個實體</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Getter</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">StudentCourse</span> &#123;<br>    <span class="hljs-keyword">private</span> Long studentId;<br>    <span class="hljs-keyword">private</span> String studentName;<br>    <span class="hljs-keyword">private</span> Long courseId;<br>    <span class="hljs-keyword">private</span> String courseTitle;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">StudentCourse</span><span class="hljs-params">(Long studentId, String studentName, Long courseId, String courseTitle)</span> &#123;<br>        <span class="hljs-built_in">this</span>.studentId = studentId;<br>        <span class="hljs-built_in">this</span>.studentName = studentName;<br>        <span class="hljs-built_in">this</span>.courseId = courseId;<br>        <span class="hljs-built_in">this</span>.courseTitle = courseTitle;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>並且建立一個Repository</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">StudentRepository</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">JpaRepository</span>&lt;Student, Long&gt; &#123;<br><br>    <span class="hljs-meta">@Query(&quot;&quot;&quot;</span><br><span class="hljs-meta">        SELECT new com.example.demoJPA.demoJPA.po.StudentCourse(</span><br><span class="hljs-meta">            s.id, s.name, c.id, c.title</span><br><span class="hljs-meta">        )</span><br><span class="hljs-meta">        FROM Student s</span><br><span class="hljs-meta">        LEFT JOIN s.courses c</span><br><span class="hljs-meta">        &quot;&quot;&quot;)</span><br>    List&lt;StudentCourse&gt; <span class="hljs-title function_">findAllByJPQL</span><span class="hljs-params">()</span>;<br><br>    <span class="hljs-meta">@Query(&quot;&quot;&quot;</span><br><span class="hljs-meta">        SELECT new com.example.demoJPA.demoJPA.po.StudentCourse(</span><br><span class="hljs-meta">            s.id, s.name, c.id, c.title</span><br><span class="hljs-meta">        )</span><br><span class="hljs-meta">        FROM Student s</span><br><span class="hljs-meta">        LEFT JOIN s.courses c</span><br><span class="hljs-meta">        WHERE s.name = ?1</span><br><span class="hljs-meta">        &quot;&quot;&quot;)</span><br>    List&lt;StudentCourse&gt; <span class="hljs-title function_">findAllByNameAndJPQL</span><span class="hljs-params">(String name)</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>並且在撰寫兩個單元測試</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Test</span><br><span class="hljs-keyword">void</span> <span class="hljs-title function_">testFindAllByJPQL</span><span class="hljs-params">()</span> &#123;<br>	List&lt;StudentCourse&gt; studentCourses = studentRepository.findAllByJPQL();<br>	studentCourses.forEach(student -&gt; &#123;<br>		log.info(<span class="hljs-string">&quot;StudentId: &#123;&#125;, Student: &#123;&#125;&quot;</span>, student.getStudentId(), student.getStudentName());<br>		log.info(<span class="hljs-string">&quot;course: &#123;&#125;&quot;</span>, student.getCourseTitle());<br>	&#125;);<br>&#125;<br><br><span class="hljs-meta">@Test</span><br><span class="hljs-keyword">void</span> <span class="hljs-title function_">testFindByNameAndJPQL</span><span class="hljs-params">()</span> &#123;<br>	List&lt;StudentCourse&gt; students = studentRepository.findAllByNameAndJPQL(<span class="hljs-string">&quot;Alice&quot;</span>);<br>	students.forEach(student -&gt; &#123;<br>		log.info(<span class="hljs-string">&quot;StudentId: &#123;&#125;, Student: &#123;&#125;&quot;</span>, student.getStudentId(), student.getStudentName());<br>		log.info(<span class="hljs-string">&quot;course: &#123;&#125;&quot;</span>, student.getCourseTitle());<br>	&#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="結論-2"><a href="#結論-2" class="headerlink" title="結論"></a>結論</h3><p>使用JPQL的優點就是我們可以很簡單的透過寫SQL就找到我們要的資料，不須像@NamedEntityGraph + @EntityGraph那樣的繁瑣。</p>
+<p>但缺點就是當今天若有新增欄位或新增關聯時，必須將整個SQL改寫，增加了維運上的負擔。</p>
+<h1 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h1><p>使用FetchType.EAGER、@NamedEntityGraph + @EntityGraph、JPQL都各有優缺點，使用的情境不同應該依情境選擇使用。FetchType.EAGER設定容易適合用在資料量不會很多的關聯上，@NamedEntityGraph + @EntityGraph設定上更為彈性，但當資料關聯性較為複雜時可能會較難設計，且學習成本較高，JPQL是很直覺的作法，SQL看起來就是一目了然，但是可能會造成後續維運上的困難。</p>
 
                 
               </div>
